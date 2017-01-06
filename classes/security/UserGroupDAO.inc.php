@@ -682,15 +682,16 @@ class UserGroupDAO extends DAO {
 	 * @param $filename
 	 * @return boolean true === success
 	 */
-	function installSettings($contextId, $filename) {
+function installSettings($contextId, $filename) {
 		$xmlParser = new XMLParser();
 		$tree = $xmlParser->parse($filename);
-
+		$site = Request::getSite();
+		$installedLocales = $site->getInstalledLocales();
+		
 		if (!$tree) {
 			$xmlParser->destroy();
 			return false;
 		}
-
 		foreach ($tree->getChildren() as $setting) {
 			$roleId = hexdec($setting->getAttribute('roleId'));
 			$nameKey = $setting->getAttribute('name');
@@ -698,17 +699,14 @@ class UserGroupDAO extends DAO {
 			$permitSelfRegistration = $setting->getAttribute('permitSelfRegistration');
 			$defaultStages = explode(',', $setting->getAttribute('stages'));
 			$userGroup = $this->newDataObject();
-
 			// create a role associated with this user group
 			$userGroup = $this->newDataObject();
 			$userGroup->setRoleId($roleId);
 			$userGroup->setContextId($contextId);
 			$userGroup->setPermitSelfRegistration($permitSelfRegistration);
 			$userGroup->setDefault(true);
-
 			// insert the group into the DB
 			$userGroupId = $this->insertObject($userGroup);
-
 			// Install default groups for each stage
 			if (is_array($defaultStages)) { // test for groups with no stage assignments
 				foreach ($defaultStages as $stageId) {
@@ -717,16 +715,16 @@ class UserGroupDAO extends DAO {
 					}
 				}
 			}
-
 			// add the i18n keys to the settings table so that they
 			// can be used when a new locale is added/reloaded
 			$this->updateSetting($userGroup->getId(), 'nameLocaleKey', $nameKey);
 			$this->updateSetting($userGroup->getId(), 'abbrevLocaleKey', $abbrevKey);
-
-			// install the settings in the current locale for this context
-			$this->installLocale(AppLocale::getLocale(), $contextId);
+			// install the settings for all locales
+			foreach($installedLocales as $localeKey) {
+				$this->installLocale($localeKey, $contextId);			
+			}
+			
 		}
-
 		return true;
 	}
 
