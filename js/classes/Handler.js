@@ -597,6 +597,9 @@
 					icon.attr('id', 'mceLocalizationIcon-' + id);
 					$(this).wrap(iconParent);
 					$(this).parent().append(icon);
+					
+					showLocale = $(this).attr('placeholder');
+					if (typeof showLocale !== "undefined") $(this).parent().prepend('<div>' + showLocale + '</div>');					
 
 					if ($(this).hasClass('localizable')) {
 						// Add a globe icon to localizable TinyMCE textareas
