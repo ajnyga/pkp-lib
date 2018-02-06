@@ -31,22 +31,6 @@
 
 		{include file="controllers/notification/inPlaceNotification.tpl" notificationId="queryFormNotification"}
 
-<<<<<<< HEAD
-		{fbvFormSection class="query_participants" title="editor.submission.stageParticipants" required="true"}
-			<ul>
-				{foreach from=$participantOptions item=participantOption}
-					<li>
-						{assign var="inputId" value="queryForm-user-"|concat:$participantOption.user->getId()}
-						<label for="{$inputId}">
-							<input type="checkbox" name="users[]" id="{$inputId}" value="{$participantOption.user->getId()}"{if $participantOption.isParticipant} checked="checked"{/if}>
-							<span class="name">{$participantOption.user->getFullName()}</span>
-							<span class="role">{$participantOption.userGroup}</span>
-						</label>
-					</li>
-				{/foreach}
-			</ul>
-		{/fbvFormSection}
-=======
 		{if $queryParticipantsListData}
 			{fbvFormSection}
 				{assign var="uuid" value=""|uniqid|escape}
@@ -57,7 +41,6 @@
 				</div>
 			{/fbvFormSection}
 		{/if}
->>>>>>> master
 
 		{fbvFormArea id="queryContentsArea"}
 			{fbvFormSection title="common.subject" for="subject" required="true"}
