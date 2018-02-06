@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/usageStats/UsageStatsOptoutBlockPlugin.inc.php
  *
- * Copyright (c) 2013-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2013-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class UsageStatsOptoutBlockPlugin
@@ -78,11 +78,11 @@ class UsageStatsOptoutBlockPlugin extends BlockPlugin {
 	}
 
 	/**
-	 * @copydoc PKPPlugin::getSeq()
+	 * @copydoc BlockPlugin::getSeq()
 	 */
-	function getSeq() {
+	function getSeq($contextId = null) {
 		// Identify the position of the faceting block.
-		$seq = parent::getSeq();
+		$seq = parent::getSeq($contextId);
 
 		// If nothing has been configured then show the privacy
 		// block after all other blocks in the context.

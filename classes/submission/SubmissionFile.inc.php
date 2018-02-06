@@ -3,8 +3,8 @@
 /**
  * @file classes/submission/SubmissionFile.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubmissionFile
@@ -336,24 +336,6 @@ class SubmissionFile extends PKPFile {
 	}
 
 	/**
-	 * Get type of the file.
-	 * @return int
-	 */
-	function getType() {
-		if (Config::getVar('debug', 'deprecation_warnings')) trigger_error('Deprecated function.');
-		return $this->getFileStage();
-	}
-
-	/**
-	 * Set type of the file.
-	 * @param $type int
-	 */
-	function setType($type) {
-		if (Config::getVar('debug', 'deprecation_warnings')) trigger_error('Deprecated function.');
-		return $this->setFileStage($type);
-	}
-
-	/**
 	 * Get file stage of the file.
 	 * @return int SUBMISSION_FILE_...
 	 */
@@ -435,22 +417,6 @@ class SubmissionFile extends PKPFile {
 	 */
 	function getUploaderUserId() {
 		return $this->getData('uploaderUserId');
-	}
-
-	/**
-	 * Set the uploader's user group id
-	 * @param $userGroupId int
-	 */
-	function setUserGroupId($userGroupId) {
-		$this->setData('userGroupId', $userGroupId);
-	}
-
-	/**
-	 * Get the uploader's user group id
-	 * @return int
-	 */
-	function getUserGroupId() {
-		return $this->getData('userGroupId');
 	}
 
 	/**
@@ -620,8 +586,6 @@ class SubmissionFile extends PKPFile {
 	function _generateName($anonymous = false) {
 		$genreDao = DAORegistry::getDAO('GenreDAO');
 		$genre = $genreDao->getById($this->getGenreId());
-		$userGroupDAO = DAORegistry::getDAO('UserGroupDAO');
-		$userGroup = $userGroupDAO->getById($this->getUserGroupId());
 		$userDAO = DAORegistry::getDAO('UserDAO');
 		$user = $userDAO->getById($this->getUploaderUserId());
 
@@ -632,7 +596,6 @@ class SubmissionFile extends PKPFile {
 		if ($genre) {
 			$genreName = $genre->getName($submissionLocale) ? $genre->getName($submissionLocale) : $genre->getLocalizedName();
 		}
-		$userGroupName = $userGroup->getName($submissionLocale) ? $userGroup->getName($submissionLocale) : $userGroup->getLocalizedName();
 
 		$localeKey = $anonymous ? 'common.file.anonymousNamingPattern' : 'common.file.namingPattern';
 		return __($localeKey,
@@ -641,7 +604,6 @@ class SubmissionFile extends PKPFile {
 				'docType'          => $this->getDocumentType(),
 				'originalFilename' => $this->getOriginalFilename(),
 				'username'         => $user->getUsername(),
-				'userGroup'        => $userGroupName,
 			),
 			$submissionLocale
 		);

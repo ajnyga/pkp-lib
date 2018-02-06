@@ -4,8 +4,8 @@
 <!--
   * locale/uk_UA/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings for the uk_UA (Українська) locale.
@@ -106,8 +106,8 @@
 	<message key="common.fileName">Ім'я файлу</message>
 	<message key="common.fileSize">Розмір файлу</message>
 	<message key="common.fileType">Тип файлу</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.height">Висота</message>
 	<message key="common.homePageHeaderLogo.altText">Логотип заголовку домашньої сторінки</message>
 	<message key="common.hour">Година</message>

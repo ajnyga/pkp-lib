@@ -2,8 +2,8 @@
 /**
  * @file controllers/list/ListHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2016 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ListHandler
@@ -54,7 +54,7 @@ abstract class ListHandler extends PKPHandler {
 	 * Retrieve the configuration data to be used when initializing this
 	 * handler on the frontend
 	 *
-	 * return array Configuration data
+	 * @return array Configuration data
 	 */
 	abstract function getConfig();
 }

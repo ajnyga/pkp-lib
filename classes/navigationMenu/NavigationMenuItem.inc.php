@@ -3,8 +3,8 @@
 /**
  * @file classes/navigationMenu/NavigationMenuItem.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class NavigationMenuItem
@@ -36,6 +36,7 @@ class NavigationMenuItem extends DataObject {
 	var $navigationMenuItems = array();
 
 	var $_isDisplayed = true;
+	var $_isChildVisible = false;
 
 	//
 	// Get/set methods
@@ -187,6 +188,22 @@ class NavigationMenuItem extends DataObject {
 	 */
 	function setIsDisplayed($isDisplayed) {
 		$this->_isDisplayed = $isDisplayed;
+	}
+
+	/**
+	 * Get $isChildVisible for this navigation menu item.
+	 * @return boolean true if at least one NMI child is visible. It is defined at the Service functionality level
+	 */
+	function getIsChildVisible() {
+		return $this->_isChildVisible;
+	}
+
+	/**
+	 * Set $isChildVisible for this navigation menu item.
+	 * @param $isChildVisible boolean true if at least one NMI child is visible. It is defined at the Service functionality level
+	 */
+	function setIsChildVisible($isChildVisible) {
+		$this->_isChildVisible = $isChildVisible;
 	}
 }
 

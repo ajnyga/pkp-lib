@@ -3,8 +3,8 @@
 /**
  * @file classes/plugins/BlockPlugin.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class BlockPlugin
@@ -36,6 +36,7 @@ abstract class BlockPlugin extends LazyLoadPlugin {
 				$hookName = $contextMap[$blockContext];
 				HookRegistry::register($hookName, array($this, 'callback'));
 			}
+			$this->_registerTemplateResource();
 		}
 		return $success;
 	}
@@ -160,7 +161,7 @@ abstract class BlockPlugin extends LazyLoadPlugin {
 	function getContents($templateMgr, $request = null) {
 		$blockTemplateFilename = $this->getBlockTemplateFilename();
 		if ($blockTemplateFilename === null) return '';
-		return $templateMgr->fetch($this->getTemplatePath() . $blockTemplateFilename);
+		return $templateMgr->fetch($this->getTemplateResourceName() . ':' . $blockTemplateFilename);
 	}
 
 	/**

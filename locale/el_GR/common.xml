@@ -4,8 +4,8 @@
 <!--
   * locale/el_GR/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings for the el_GR (ελληνικά) locale.
@@ -91,8 +91,8 @@
 	<message key="common.fileName">Όνομα αρχείου</message>
 	<message key="common.fileSize">Μέγεθος αρχείου</message>
 	<message key="common.fileType">Τύπος αρχείου</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.height">Ύψος</message>
 	<message key="common.homePageHeaderLogo.altText">Logo Επικεφαλίδας Αρχικής Σελίδας</message>
 	<message key="common.hour">Ώρα</message>

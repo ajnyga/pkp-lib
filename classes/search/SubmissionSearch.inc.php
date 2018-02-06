@@ -3,8 +3,8 @@
 /**
  * @file classes/search/SubmissionSearch.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubmissionSearch
@@ -243,14 +243,14 @@ abstract class SubmissionSearch {
 
 		// Check whether a search plug-in jumps in to provide ranked search results.
 		$totalResults = null;
-		$results = HookRegistry::call(
+		$hookResult = HookRegistry::call(
 			'SubmissionSearch::retrieveResults',
-			array(&$context, &$keywords, $publishedFrom, $publishedTo, $orderBy, $orderDir, $exclude, $page, $itemsPerPage, &$totalResults, &$error)
+			array(&$context, &$keywords, $publishedFrom, $publishedTo, $orderBy, $orderDir, $exclude, $page, $itemsPerPage, &$totalResults, &$error, &$results)
 		);
 
 		// If no search plug-in is activated then fall back to the
 		// default database search implementation.
-		if ($results === false) {
+		if ($hookResult === false) {
 			// Parse the query.
 			foreach($keywords as $searchType => $query) {
 				$keywords[$searchType] = $this->_parseQuery($query);

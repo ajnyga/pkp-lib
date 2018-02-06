@@ -3,8 +3,8 @@
 /**
  * @file controllers/grid/users/queries/form/QueryForm.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class QueryForm
@@ -189,6 +189,7 @@ class QueryForm extends Form {
 		$headNote = $query->getHeadNote();
 		$user = $request->getUser();
 
+<<<<<<< HEAD
 		$stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
 		$assignments = $stageAssignmentDao->getBySubmissionAndStageId($query->getAssocId(), $query->getStageId());
 		$queryDao = DAORegistry::getDAO('QueryDAO');
@@ -287,14 +288,63 @@ class QueryForm extends Form {
 
 		}
 
+=======
+>>>>>>> master
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign(array(
 			'isNew' => $this->_isNew,
 			'noteId' => $headNote->getId(),
 			'actionArgs' => $actionArgs,
-			'participantOptions' => $participantOptions,
 			'csrfToken' => $request->getSession()->getCSRFToken(),
 		));
+
+		// Queryies only support ASSOC_TYPE_SUBMISSION so far
+		if ($query->getAssocType() === ASSOC_TYPE_SUBMISSION) {
+
+			$queryDao = DAORegistry::getDAO('QueryDAO');
+			$selectedParticipants = $query->getId() ? $queryDao->getParticipantIds($query->getId()) : array();
+
+			$stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+			$assignments = $stageAssignmentDao->getBySubmissionAndStageId($query->getAssocId(), $query->getStageId())
+				->toArray();
+
+			import('lib.pkp.controllers.list.users.SelectUserListHandler');
+			$queryParticipantsList = new SelectUserListHandler(array(
+				'title' => 'editor.submission.stageParticipants',
+				'inputName' => 'users[]',
+				'selected' => $selectedParticipants,
+				'getParams' => array(
+					'count' => 100, // high upper value
+					'offset' => 0,
+					'assignedToSubmission' => $query->getAssocId(),
+					'assignedToSubmissionStage' => $query->getStageId(),
+				),
+				// Include the full name and role in this submission in the item title
+				'setItemTitleCallback' => function($user, $userProps) use ($assignments) {
+					$title = $user->getFullName();
+					foreach ($assignments as $assignment) {
+						if ($assignment->getUserId() === $user->getId()) {
+							foreach ($userProps['groups'] as $userGroup) {
+								if ($userGroup['id'] === (int) $assignment->getUserGroupId() && isset($userGroup['name'][AppLocale::getLocale()])) {
+									$title =  __('submission.query.participantTitle', array(
+										'fullName' => $user->getFullName(),
+										'userGroup' => $userGroup['name'][AppLocale::getLocale()],
+									));
+								}
+							}
+						}
+					}
+					return $title;
+				},
+			));
+
+			$queryParticipantsListData = $queryParticipantsList->getConfig();
+
+			$templateMgr->assign(array(
+				'hasParticipants' => count($queryParticipantsListData['collection']['items']),
+				'queryParticipantsListData' => json_encode($queryParticipantsListData),
+			));
+		}
 
 		return parent::fetch($request);
 	}

@@ -4,8 +4,8 @@
 <!--
   * locale/id_ID/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2003-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings.
@@ -110,8 +110,8 @@
 	<message key="common.fileName">Nama File</message>
 	<message key="common.fileSize">Ukuran File</message>
 	<message key="common.fileType">Tipe File</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.height">Tinggi</message>
 	<message key="common.homePageHeaderLogo.altText">Logo Header Beranda</message>
 	<message key="common.hour">Jam</message>

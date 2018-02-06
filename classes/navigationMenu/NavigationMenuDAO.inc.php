@@ -3,8 +3,8 @@
 /**
  * @file classes/navigationMenu/NavigationMenuDAO.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class NavigationMenuDAO
@@ -78,12 +78,7 @@ class NavigationMenuDAO extends DAO {
 			$params
 		);
 
-		$returner = null;
-		if ($result->RecordCount() != 0) {
-			$returner = $this->_fromRow($result->GetRowAssoc(false));
-		}
-		$result->Close();
-		return $returner;
+		return new DAOResultFactory($result, $this, '_fromRow');
 	}
 
 	/**
@@ -197,6 +192,8 @@ class NavigationMenuDAO extends DAO {
 			)
 		);
 
+		$this->unCache($navigationMenu->getId());
+
 		return $returner;
 	}
 
@@ -214,6 +211,8 @@ class NavigationMenuDAO extends DAO {
 	 * @param $navigationMenuId int
 	 */
 	function deleteById($navigationMenuId) {
+		$this->unCache($navigationMenuId);
+
 		$this->update('DELETE FROM navigation_menus WHERE navigation_menu_id = ?', (int) $navigationMenuId);
 
 		$navigationMenuItemAssignmentDao = DAORegistry::getDAO('NavigationMenuItemAssignmentDAO');
@@ -302,6 +301,52 @@ class NavigationMenuDAO extends DAO {
 		}
 
 		return true;
+	}
+
+	/**
+	 * unCache the NM with id
+	 * @param int $id
+	 */
+	function unCache($id){
+		$cache = $this->getCache($id);
+		if ($cache) $cache->flush();
+	}
+
+	/**
+	 * Get the settings cache for a given ID
+	 * @param $id
+	 * @return array|null (Null indicates caching disabled)
+	 */
+	function getCache($id) {
+		static $navigationMenuCache;
+		if (!isset($navigationMenuCache)) {
+			$navigationMenuCache = array();
+		}
+		if (!isset($navigationMenuCache[$id])) {
+			$cacheManager = \CacheManager::getManager();
+			$navigationMenuCache[$id] = $cacheManager->getCache(
+				'navigationMenu', $id,
+				array($this, '_cacheMiss')
+			);
+		}
+		return $navigationMenuCache[$id];
+	}
+
+	/**
+	 * Callback for a cache miss.
+	 * @param $cache Cache
+	 * @param $id string
+	 * @return mixed
+	 */
+	function _cacheMiss($cache, $id) {
+		$navigationMenuDao = \DAORegistry::getDAO('NavigationMenuDAO');
+		$navigationMenu = $navigationMenuDao->GetById($cache->getCacheId());
+		import('classes.core.ServicesContainer');
+		ServicesContainer::instance()
+			->get('navigationMenu')
+			->getMenuTree($navigationMenu);
+
+		return $navigationMenu;
 	}
 }
 

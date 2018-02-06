@@ -10,8 +10,8 @@
 /**
  * @file classes/form/Form.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class Form
@@ -221,7 +221,7 @@ class Form {
 	 * @param $key string|array If a string, then set a single field. If an associative array, then set many.
 	 * @param $value mixed
 	 */
-	function setData($key, $value) {
+	function setData($key, $value = null) {
 		if (is_array($key)) foreach($key as $aKey => $aValue) {
 			$this->setData($aKey, $aValue);
 		} else {

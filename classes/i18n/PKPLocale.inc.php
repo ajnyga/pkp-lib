@@ -8,8 +8,8 @@
 /**
  * @file classes/i18n/PKPLocale.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PKPLocale
@@ -67,6 +67,7 @@ define('LOCALE_COMPONENT_APP_AUTHOR',		0x00000103);
 define('LOCALE_COMPONENT_APP_EDITOR',		0x00000104);
 define('LOCALE_COMPONENT_APP_ADMIN',		0x00000105);
 define('LOCALE_COMPONENT_APP_DEFAULT',		0x00000106);
+define('LOCALE_COMPONENT_APP_API',		0x00000107);
 
 class PKPLocale {
 	static $request;

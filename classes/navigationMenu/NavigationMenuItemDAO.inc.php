@@ -3,8 +3,8 @@
 /**
  * @file classes/navigationMenu/NavigationMenuItemDAO.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class NavigationMenuItemDAO
@@ -45,9 +45,9 @@ class NavigationMenuItemDAO extends DAO {
 	 * @return NavigationMenuItem
 	 */
 	function getByPath($contextId, $path) {
-		$params = array($path, (int) $contextId);
+		$params = array($path, (int) $contextId, 'NMI_TYPE_CUSTOM');
 		$result = $this->retrieve(
-			'SELECT	* FROM navigation_menu_items WHERE path = ? and context_id = ?',
+			'SELECT	* FROM navigation_menu_items WHERE path = ? and context_id = ? and type= ?',
 			$params
 		);
 
@@ -188,6 +188,9 @@ class NavigationMenuItemDAO extends DAO {
 		);
 		$navigationMenuItem->setId($this->getInsertId());
 		$this->updateLocaleFields($navigationMenuItem);
+
+		$this->unCacheRelatedNavigationMenus($navigationMenuItem->getId());
+
 		return $navigationMenuItem->getId();
 	}
 
@@ -214,6 +217,9 @@ class NavigationMenuItemDAO extends DAO {
 			)
 		);
 		$this->updateLocaleFields($navigationMenuItem);
+
+		$this->unCacheRelatedNavigationMenus($navigationMenuItem->getId());
+
 		return $returner;
 	}
 
@@ -232,6 +238,8 @@ class NavigationMenuItemDAO extends DAO {
 	 * @return boolean
 	 */
 	function deleteById($navigationMenuItemId) {
+		$this->unCacheRelatedNavigationMenus($navigationMenuItemId);
+
 		$this->update('DELETE FROM navigation_menu_item_settings WHERE navigation_menu_item_id = ?', (int) $navigationMenuItemId);
 		$this->update('DELETE FROM navigation_menu_items WHERE navigation_menu_item_id = ?', (int) $navigationMenuItemId);
 
@@ -311,7 +319,7 @@ class NavigationMenuItemDAO extends DAO {
 		if ($contextId != CONTEXT_ID_NONE) {
 			$contextDao = Application::getContextDAO();
 			$context = $contextDao->getById($contextId);
-			$supportedLocales = $context->getSupportedSubmissionLocales();
+			$supportedLocales = $context->getSupportedLocales();
 		} else {
 			$siteDao = DAORegistry::getDAO('SiteDAO');
 			$site = $siteDao->getSite();
@@ -325,14 +333,12 @@ class NavigationMenuItemDAO extends DAO {
 		$navigationMenuItemExisting = $this->getByTypeAndTitleLocaleKey($contextId, $type, $titleKey);
 
 		if (!isset($navigationMenuItemExisting)) {
-			// create a role associated with this user group
 			$navigationMenuItem = $this->newDataObject();
 			$navigationMenuItem->setPath($path);
 			$navigationMenuItem->setContextId($contextId);
 
 			$navigationMenuItem->setType($type);
 
-			// insert the group into the DB
 			$navigationMenuItemId = $this->insertObject($navigationMenuItem);
 
 			// add the i18n keys to the settings table so that they
@@ -345,6 +351,13 @@ class NavigationMenuItemDAO extends DAO {
 			}
 		} else {
 			$navigationMenuItemId = $navigationMenuItemExisting->getId();
+
+			$this->updateSetting($navigationMenuItemId, 'titleLocaleKey', $titleKey);
+
+			// install the settings in the current locale for this context
+			foreach ($supportedLocales as $locale) {
+				$this->installLocale($locale, $contextId);
+			}
 		}
 
 		// insert into Assignments
@@ -388,17 +401,19 @@ class NavigationMenuItemDAO extends DAO {
 	 * @param $contextId
 	 */
 	function installLocale($locale, $contextId = null) {
-		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_MANAGER, LOCALE_COMPONENT_APP_COMMON, LOCALE_COMPONENT_PKP_USER, $locale);
+		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_PKP_MANAGER, LOCALE_COMPONENT_APP_COMMON, LOCALE_COMPONENT_PKP_USER, $locale);
 		$navigationMenuItems = $this->getByContextId($contextId);
 		while ($navigationMenuItem = $navigationMenuItems->next()) {
 			$titleKey = $this->getSetting($navigationMenuItem->getId(), 'titleLocaleKey');
-			$this->updateSetting($navigationMenuItem->getId(),
-				'title',
-				array($locale => __($titleKey, null, $locale)),
-				'string',
-				$locale,
-				true
-			);
+			if (!$navigationMenuItem->getTitle($locale) || $navigationMenuItem->getTitle($locale) == $titleKey) {
+				$this->updateSetting($navigationMenuItem->getId(),
+					'title',
+					array($locale => __($titleKey, null, $locale)),
+					'string',
+					$locale,
+					true
+				);
+			}
 		}
 	}
 
@@ -484,6 +499,52 @@ class NavigationMenuItemDAO extends DAO {
 	 */
 	function deleteSettingsByLocale($locale) {
 		return $this->update('DELETE FROM navigation_menu_item_settings WHERE locale = ?', $locale);
+	}
+
+	/**
+	 * Uncache the related NMs to the NMI with $id
+	 * @param mixed $id
+	 */
+	function unCacheRelatedNavigationMenus($id) {
+		$navigationMenuDao = \DAORegistry::getDAO('NavigationMenuDAO');
+		$navigationMenuItemAssignmentDao = \DAORegistry::getDAO('NavigationMenuItemAssignmentDAO');
+		$assignments = $navigationMenuItemAssignmentDao->getByMenuItemId($id);
+		if ($assignments) {
+			$assignmentsArray = $assignments->toArray();
+			foreach ($assignmentsArray as $assignment) {
+				$cache = $navigationMenuDao->getCache($assignment->getMenuId());
+				if ($cache) $cache->flush();
+			}
+		}
+	}
+
+	/**
+	 * Port static page as a Custom NMI
+	 * @param StaticPage $staticPage
+	 * @return int The id of the inserted NMI. Null if non is inserted
+	 */
+	function portStaticPage($staticPage) {
+		$path = $staticPage->getPath();
+		$contextId = $staticPage->getContextId();
+
+		$existingNMIWithPath = $this->getByPath($contextId, $path);
+
+		$retNavigationMenuItemId = null;
+
+		if (!isset($existingNMIWithPath)) {
+			$navigationMenuItem = $this->newDataObject();
+
+			$navigationMenuItem->setPath($path);
+			$navigationMenuItem->setContextId($contextId);
+			$navigationMenuItem->setType(NMI_TYPE_CUSTOM);
+
+			$navigationMenuItem->setTitle($staticPage->getTitle(null), null);
+			$navigationMenuItem->setContent($staticPage->getContent(null), null);
+
+			$retNavigationMenuItemId = $this->insertObject($navigationMenuItem);
+		}
+
+		return $retNavigationMenuItemId;
 	}
 }
 

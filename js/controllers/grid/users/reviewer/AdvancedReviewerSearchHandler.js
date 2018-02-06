@@ -4,8 +4,8 @@
 /**
  * @file js/controllers/AdvancedReviewerSearchHandler.js
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class AdvancedReviewerSearchHandler
@@ -60,7 +60,8 @@
 
 		// Get the selected reviewer's ID
 		var $selectedInput = this.getHtmlElement().
-				find('#reviewerSelectGridContainer').find('input:checked'),
+				find('#reviewerSelectGridContainer')
+						.find('input[name="reviewerId"]:checked'),
 				reviewerId = /** @type {string} */ ($selectedInput.val()),
 				reviewerName;
 

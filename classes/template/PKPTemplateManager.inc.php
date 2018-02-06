@@ -8,8 +8,8 @@
 /**
  * @file classes/template/PKPTemplateManager.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class TemplateManager
@@ -281,20 +281,10 @@ class PKPTemplateManager extends Smarty {
 			}
 
 			// Register Navigation Menus
-			if ($currentContext) {
-				$navigationMenuDao = DAORegistry::getDAO('NavigationMenuDAO');
-				$navigationMenus = $navigationMenuDao->getByContextId($currentContext->getId(), null);
-				$navigationMenusArray = $navigationMenus->toAssociativeArray();
+			import('classes.core.ServicesContainer');
+			$nmService = ServicesContainer::instance()->get('navigationMenu');
 
-				foreach ($navigationMenusArray as $navigationMenu) {
-					import('classes.core.ServicesContainer');
-					ServicesContainer::instance()
-						->get('navigationMenu')
-						->getMenuTree($navigationMenu);
-				}
-
-				$this->assign('navigationMenus', $navigationMenusArray);
-			}
+			\HookRegistry::register('LoadHandler', array($nmService, '_callbackHandleCustomNavigationMenuItems'));
 		}
 
 		// Register custom functions
@@ -1588,8 +1578,9 @@ class PKPTemplateManager extends Smarty {
 		$navigationMenuDao = DAORegistry::getDAO('NavigationMenuDAO');
 
 		$output = '';
-		$navigationMenu = $navigationMenuDao->getByArea($contextId, $areaName);
-		if (isset($navigationMenu)) {
+		$navigationMenus = $navigationMenuDao->getByArea($contextId, $areaName)->toArray();
+		if (isset($navigationMenus[0])) {
+			$navigationMenu = $navigationMenus[0];
 			import('classes.core.ServicesContainer');
 			ServicesContainer::instance()
 				->get('navigationMenu')
@@ -1662,16 +1653,24 @@ class PKPTemplateManager extends Smarty {
 	 */
 	function smartyPluckFiles($params, $smarty) {
 
+		// The variable to assign the result to.
+		if (empty($params['assign'])) {
+			error_log('Smarty: {pluck_files} function called without required `assign` param. Called in ' . __FILE__ . ':' . __LINE__);
+			return;
+		}
+
 		// $params['files'] should be an array of SubmissionFile objects
 		if (!is_array($params['files'])) {
 			error_log('Smarty: {pluck_files} function called without required `files` param. Called in ' . __FILE__ . ':' . __LINE__);
-			return array();
+			$smarty->assign($params['assign'], array());
+			return;
 		}
 
 		// $params['by'] is one of an approved list of attributes to select by
 		if (empty($params['by'])) {
 			error_log('Smarty: {pluck_files} function called without required `by` param. Called in ' . __FILE__ . ':' . __LINE__);
-			return array();
+			$smarty->assign($params['assign'], array());
+			return;
 		}
 
 		// The approved list of `by` attributes
@@ -1682,19 +1681,15 @@ class PKPTemplateManager extends Smarty {
 		// genre Any files with a genre ID (file genres are configurable but typically refer to Manuscript, Bibliography, etc)
 		if (!in_array($params['by'], array('chapter','publicationFormat','component','fileExtension','genre'))) {
 			error_log('Smarty: {pluck_files} function called without a valid `by` param. Called in ' . __FILE__ . ':' . __LINE__);
-			return array();
+			$smarty->assign($params['assign'], array());
+			return;
 		}
 
 		// The value to match against. See docs for `by` param
 		if (!isset($params['value'])) {
 			error_log('Smarty: {pluck_files} function called without required `value` param. Called in ' . __FILE__ . ':' . __LINE__);
-			return array();
-		}
-
-		// The variable to assign the result to.
-		if (empty($params['assign'])) {
-			error_log('Smarty: {pluck_files} function called without required `assign` param. Called in ' . __FILE__ . ':' . __LINE__);
-			return array();
+			$smarty->assign($params['assign'], array());
+			return;
 		}
 
 		$matching_files = array();

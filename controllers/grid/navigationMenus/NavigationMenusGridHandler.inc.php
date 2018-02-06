@@ -3,8 +3,8 @@
 /**
  * @file controllers/grid/navigationMenus/NavigationMenusGridHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class NavigationMenusGridHandler
@@ -215,7 +215,7 @@ class NavigationMenusGridHandler extends GridHandler {
 		$context = $request->getContext();
 
 		$navigationMenuDao = DAORegistry::getDAO('NavigationMenuDAO');
-		$navigationMenu = $navigationMenuDao->getById($navigationMenuId, $context->getId());
+		$navigationMenu = $navigationMenuDao->getById($navigationMenuId, $context?$context->getId():CONTEXT_SITE);
 		if ($navigationMenu && $request->checkCSRF()) {
 			$navigationMenuDao->deleteObject($navigationMenu);
 

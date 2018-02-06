@@ -3,8 +3,8 @@
 /**
  * @file controllers/grid/languages/LanguageGridHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class LanguageGridHandler
@@ -71,6 +71,11 @@ class LanguageGridHandler extends GridHandler {
 			if (AppLocale::isLocaleValid($locale) && array_key_exists($locale, $availableLocales)) {
 				if ($settingValue) {
 					array_push($currentSettingValue, $locale);
+					if ($settingName == 'supportedFormLocales') {
+						// reload localized default context settings
+						$settingsDao = Application::getContextSettingsDAO();
+						$settingsDao->reloadLocalizedDefaultContextSettings($request, $locale);
+					}
 				} else {
 					$key = array_search($locale, $currentSettingValue);
 					if ($key !== false) unset($currentSettingValue[$key]);

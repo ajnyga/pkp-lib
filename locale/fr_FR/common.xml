@@ -4,8 +4,8 @@
 <!--
   * locale/fr_FR/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings for the fr_FR (Français (France)) locale.
@@ -98,8 +98,8 @@
 	<message key="common.fileName">Nom de fichier</message>
 	<message key="common.fileSize">Taille de fichier</message>
 	<message key="common.fileType">Type de fichier</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.height">Hauteur</message>
 	<message key="common.homePageHeaderLogo.altText">Logo de l'en-tête de la page d'accueil</message>
 	<message key="common.hour">Heure</message>
@@ -562,4 +562,16 @@
 	<message key=""><![CDATA[]]></message>
 	<message key="common.saving">Enregistrement</message>
 	<message key="notification.addedReviewerNoEmail">{$reviewerName} a été choisi pour évaluer cette soumission et il n'a pas reçu de mail de notification</message>
+	<message key="common.from">Depuis</message>
+	<message key="common.until">Jusqu'à</message>
+	<message key="semicolon">{$label}:</message>
+	<message key="notification.sendNotificationConfirmation">Envoyer un mail à tous les utilisateurs d'OJS</message>
+	<message key="stageParticipants.options">Assignation de privilèges</message>
+	<message key="stageParticipants.recommendOnly">Ce participant est seulement autorisé à faire une recommandation.</message>
+	<message key="notification.editedNavigationMenuItem">Le menu a été mis à jour.</message>
+	<message key="notification.removedNavigationMenuItem">L'élément du menu a été enlevé.</message>
+	<message key="notification.addedNavigationMenuItem">Un élément de menu a été ajouté.</message>
+	<message key="notification.addedNavigationMenu">Le menu de navigation a été ajouté.</message>
+	<message key="notification.editedNavigationMenu">Le menu a été mis à jour</message>
+	<message key="notification.removedNavigationMenu">Le menu a été supprimé</message>
 </locale>

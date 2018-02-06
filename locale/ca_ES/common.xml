@@ -4,8 +4,8 @@
 <!--
   * locale/ca_ES/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   * Credits: https://pkp.sfu.ca/wiki/index.php?title=OMP:_Catalan_(ca_ES)
   * Localization strings.
@@ -128,8 +128,8 @@
 	<message key="common.fileSize">Mida del fitxer</message>
 	<message key="common.fileType">Tipus de fitxer</message>
 	<message key="common.fileUploaderError">El fitxer de sistema s'està carregant. Si no apareix, és possible que cap dels seus entorns d'execució sigui compatible amb aquest navegador. Contacteu amb l'administrador/a per obtenir ajuda.</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.go">Vés-hi</message>
 	<message key="common.height">Alçada</message>
 	<message key="common.homePageHeaderLogo.altText">Logotip per a la capçalera de la pàgina inicial</message>

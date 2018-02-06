@@ -4,8 +4,8 @@
 <!--
   * locale/sv_SE/editor.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2003-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   * Localization information: https://pkp.sfu.ca/wiki/index.php?title=OJS:_Swedish_(sv_SE)
   * Localization strings.
@@ -109,7 +109,6 @@
 	<message key="editor.submission.createNewRound">Skapa ny granskningsomgång</message>
 	<message key="editor.article.reviewForms">Granskningsformulär</message>
 	<message key="editor.article.selectReviewForm">Välj granskningsformulär</message>
-	<message key="editor.article.clearReviewForm">Rensa granskningsformulär</message>
 	<message key="editor.article.confirmChangeReviewForm">Varning: Genom att ändra granskningsformuläret påverkas alla svar granskare redan matat in med hjälp av det här formuläret. Vill du verkligen fortsätta?</message>
 	<message key="editor.submission.noReviewerFilesSelected">Inga filer valda.</message>
 	<message key="editor.submission.noReviewerFilesSelected.details">Du har inte valt några filer som granskaren ska granska.</message>

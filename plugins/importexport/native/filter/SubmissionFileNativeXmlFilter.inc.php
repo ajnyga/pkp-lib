@@ -3,8 +3,8 @@
 /**
  * @file plugins/importexport/native/filter/SubmissionFileNativeXmlFilter.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubmissionFileNativeXmlFilter
@@ -101,11 +101,6 @@ class SubmissionFileNativeXmlFilter extends NativeExportFilter {
 		}
 		$revisionNode->setAttribute('filesize', $submissionFile->getFileSize());
 		$revisionNode->setAttribute('filetype', $submissionFile->getFileType());
-
-		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-		$userGroup = $userGroupDao->getById($submissionFile->getUserGroupId());
-		assert(isset($userGroup));
-		$revisionNode->setAttribute('user_group_ref', $userGroup->getName($context->getPrimaryLocale()));
 
 		$userDao = DAORegistry::getDAO('UserDAO');
 		$uploaderUser = $userDao->getById($submissionFile->getUploaderUserId());

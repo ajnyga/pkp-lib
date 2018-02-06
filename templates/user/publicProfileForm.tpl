@@ -1,8 +1,8 @@
 {**
  * templates/user/publicProfileForm.tpl
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * Public user profile form.
@@ -62,7 +62,7 @@
 		{fbvElement type="text" label="user.url" name="userUrl" id="userUrl" value=$userUrl maxlength="255"}
 	{/fbvFormSection}
 	{fbvFormSection}
-		{fbvElement type="text" label="user.orcid" name="orcid" id="orcid" value=$orcid maxlength="36"}
+		{fbvElement type="text" label="user.orcid" name="orcid" id="orcid" value=$orcid maxlength="37"}
 	{/fbvFormSection}
 
 	{fbvFormButtons hideCancel=true submitText="common.save"}

@@ -7,8 +7,8 @@
 /**
  * @file controllers/tab/user/ProfileTabHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ProfileTabHandler
@@ -104,7 +104,7 @@ class ProfileTabHandler extends Handler {
 			$notificationMgr->createTrivialNotification($request->getUser()->getId());
 			return new JSONMessage(true);
 		}
-		return new JSONMessage(false, $contactForm->fetch($request));
+		return new JSONMessage(true, $contactForm->fetch($request));
 	}
 
 	/**

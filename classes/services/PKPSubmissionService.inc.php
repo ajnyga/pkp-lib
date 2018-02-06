@@ -3,8 +3,8 @@
 /**
  * @file classes/services/PKPSubmissionService.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class SubmissionService
@@ -25,6 +25,8 @@ use \PKP\Services\EntityProperties\PKPBaseEntityPropertyService;
 import('lib.pkp.classes.db.DBResultRange');
 
 define('STAGE_STATUS_SUBMISSION_UNASSIGNED', 1);
+define('SUBMISSION_RETURN_SUBMISSION', 0);
+define('SUBMISSION_RETURN_PUBLISHED', 1);
 
 abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 
@@ -47,6 +49,9 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 	 * 		@option string searchPhrase
 	 * 		@option int count
 	 * 		@option int offset
+	 *		@option string returnObject Whether to return submission or published
+	 *			objects. SUBMISSION_RETURN_SUBMISSION or SUBMISSION_RETURN_PUBLISHED.
+	 *			Default: SUBMISSION_RETURN_SUBMISSION.
 	 * }
 	 *
 	 * @return array
@@ -55,9 +60,12 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 		$submissionListQB = $this->_buildGetSubmissionsQueryObject($contextId, $args);
 		$submissionListQO = $submissionListQB->get();
 		$range = new DBResultRange($args['count'], null, $args['offset']);
-		$submissionDao = Application::getSubmissionDAO();
-		$result = $submissionDao->retrieveRange($submissionListQO->toSql(), $submissionListQO->getBindings(), $range);
-		$queryResults = new DAOResultFactory($result, $submissionDao, '_fromRow');
+		$dao = Application::getSubmissionDAO();
+		if (!empty($args['returnObject']) && $args['returnObject'] === SUBMISSION_RETURN_PUBLISHED) {
+			$dao = Application::getPublishedSubmissionDAO();
+		}
+		$result = $dao->retrieveRange($submissionListQO->toSql(), $submissionListQO->getBindings(), $range);
+		$queryResults = new DAOResultFactory($result, $dao, '_fromRow');
 
 		return $queryResults->toArray();
 	}
@@ -72,9 +80,12 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 		$submissionListQB = $this->_buildGetSubmissionsQueryObject($contextId, $args);
 		$countQO = $submissionListQB->countOnly()->get();
 		$countRange = new DBResultRange($args['count'], 1);
-		$submissionDao = Application::getSubmissionDAO();
-		$countResult = $submissionDao->retrieveRange($countQO->toSql(), $countQO->getBindings(), $countRange);
-		$countQueryResults = new DAOResultFactory($countResult, $submissionDao, '_fromRow');
+		$dao = Application::getSubmissionDAO();
+		if (!empty($args['returnObject']) && $args['returnObject'] === SUBMISSION_RETURN_PUBLISHED) {
+			$dao = Application::getPublishedSubmissionDAO();
+		}
+		$countResult = $dao->retrieveRange($countQO->toSql(), $countQO->getBindings(), $countRange);
+		$countQueryResults = new DAOResultFactory($countResult, $dao, '_fromRow');
 
 		return (int) $countQueryResults->getCount();
 	}
@@ -98,6 +109,7 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 			'offset' => 0,
 			'isIncomplete' => false,
 			'isOverdue' => false,
+			'returnObject' => SUBMISSION_RETURN_SUBMISSION,
 		);
 
 		$args = array_merge($defaultArgs, $args);
@@ -110,7 +122,8 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 			->filterByStageIds($args['stageIds'])
 			->filterByIncomplete($args['isIncomplete'])
 			->filterByOverdue($args['isOverdue'])
-			->searchPhrase($args['searchPhrase']);
+			->searchPhrase($args['searchPhrase'])
+			->returnObject($args['returnObject']);
 
 		\HookRegistry::call('Submission::getSubmissions::queryBuilder', array($submissionListQB, $contextId, $args));
 
@@ -297,6 +310,62 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 	}
 
 	/**
+	 * Is this submission public?
+	 *
+	 * @param $submission Submission
+	 * @return boolean
+	 */
+	public function isPublic($submission) {
+		$isPublic = false;
+		\HookRegistry::call('Submission::isPublic', array(&$isPublic, $submission));
+		return $isPublic;
+	}
+
+	/**
+	 * Is this user allowed to view the author details?
+	 *
+	 * - Anyone can view published submission authors
+	 * - Reviewers can only view authors in open reviews
+	 * - Managers and admins can view authors of any submission
+	 * - Subeditors, authors and assistants can only view authors in assigned subs
+	 *
+	 * @param $user User
+	 * @param $submission Submission
+	 * @return boolean
+	 */
+	public function canUserViewAuthor($user, $submission) {
+
+		if ($this->isPublic($submission)) {
+			return true;
+		}
+
+		$reviewAssignments = $this->getReviewAssignments($submission);
+		foreach ($reviewAssignments as $reviewAssignment) {
+			if ($user->getId() == $reviewAssignment->getReviewerId()) {
+				return $reviewAssignment->getReviewMethod() == SUBMISSION_REVIEW_METHOD_DOUBLEBLIND ? false : true;
+			}
+		}
+
+		$contextId = $submission->getContextId();
+
+		if ($user->hasRole(array(ROLE_ID_MANAGER), $contextId) || $user->hasRole(array(ROLE_ID_SITE_ADMIN), CONTEXT_ID_NONE)) {
+			return true;
+		}
+
+		if ($user->hasRole(array(ROLE_ID_SUB_EDITOR, ROLE_ID_AUTHOR, ROLE_ID_ASSISTANT), $contextId)) {
+			$stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
+			$stageAssignments = $stageAssignmentDao->getBySubmissionAndStageId($submission->getId());
+			while ($stageAssignment = $stageAssignments->next()) {
+				if ($user->getId() == $stageAssignment->getUserId()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * @copydoc \PKP\Services\EntityProperties\EntityPropertyInterface::getProperties()
 	 */
 	public function getProperties($submission, $props, $args = null) {
@@ -441,7 +510,7 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 			'submissionProgress','urlWorkflow','urlPublished','galleysSummary','_href',
 		);
 
-		if ($context && $currentUser->hasRole(array(ROLE_ID_MANAGER, ROLE_ID_SITE_ADMIN, ROLE_ID_SUB_EDITOR, ROLE_ID_AUTHOR, ROLE_ID_ASSISTANT), $context->getId())) {
+		if ($this->canUserViewAuthor($currentUser, $submission)) {
 			$props[] = 'authorString';
 			$props[] = 'shortAuthorString';
 			$props[] = 'authorsSummary';
@@ -469,7 +538,7 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 			'galleys','_href',
 		);
 
-		if ($context && $currentUser->hasRole(array(ROLE_ID_MANAGER, ROLE_ID_SITE_ADMIN, ROLE_ID_SUB_EDITOR, ROLE_ID_AUTHOR, ROLE_ID_ASSISTANT), $context->getId())) {
+		if ($this->canUserViewAuthor($currentUser, $submission)) {
 			$props[] = 'authorString';
 			$props[] = 'shortAuthorString';
 			$props[] = 'authors';
@@ -499,7 +568,7 @@ abstract class PKPSubmissionService extends PKPBaseEntityPropertyService {
 			'urlWorkflow','urlPublished','_href',
 		);
 
-		if ($context && $currentUser->hasRole(array(ROLE_ID_MANAGER, ROLE_ID_SITE_ADMIN, ROLE_ID_SUB_EDITOR, ROLE_ID_AUTHOR, ROLE_ID_ASSISTANT), $context->getId())) {
+		if ($this->canUserViewAuthor($currentUser, $submission)) {
 			$props[] = 'authorString';
 		}
 

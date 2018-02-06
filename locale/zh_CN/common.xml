@@ -4,8 +4,8 @@
 <!--
   * locale/zh_CN/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings for the en_US (English) locale.
@@ -100,8 +100,8 @@
 	<message key="common.fileName">文件名</message>
 	<message key="common.fileSize">文件大小</message>
 	<message key="common.fileType">文件类型</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.height">高度</message>
 	<message key="common.homePageHeaderLogo.altText">首页头部Logo</message>
 	<message key="common.hour">小时</message>

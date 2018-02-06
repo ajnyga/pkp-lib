@@ -3,8 +3,8 @@
 /**
  * @file classes/core/PKPApplication.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PKPApplication
@@ -84,7 +84,7 @@ interface iPKPApplicationInfoProvider {
 	 * This is necessary to prevent a column name mismatch during
 	 * the upgrade process when the codebase and the database are out
 	 * of sync.
-	 * See:  http://pkp.sfu.ca/bugzilla/show_bug.cgi?id=8265
+	 * See:  https://pkp.sfu.ca/bugzilla/show_bug.cgi?id=8265
 	 *
 	 * The 'generic' category of plugin is loaded before the schema
 	 * is reconciled.  Subclasses of PKPApplication perform a check
@@ -113,7 +113,7 @@ interface iPKPApplicationInfoProvider {
 }
 
 abstract class PKPApplication implements iPKPApplicationInfoProvider {
-	var $enabledProducts;
+	var $enabledProducts = array();
 	var $allProducts;
 
 	/**
@@ -292,35 +292,34 @@ abstract class PKPApplication implements iPKPApplicationInfoProvider {
 	 * @return array
 	 */
 	function &getEnabledProducts($category = null, $mainContextId = null) {
-		if (is_null($this->enabledProducts) || !is_null($mainContextId)) {
-			$contextDepth = $this->getContextDepth();
+		$contextDepth = $this->getContextDepth();
+		if (is_null($mainContextId)) {
+			$request = $this->getRequest();
+			$router = $request->getRouter();
 
+			// Try to identify the main context (e.g. journal, conference, press),
+			// will be null if none found.
+			$mainContext = $router->getContext($request, 1);
+			if ($mainContext) $mainContextId = $mainContext->getId();
+			else $mainContextId = CONTEXT_SITE;
+		}
+		if (!isset($this->enabledProducts[$mainContextId])) {
 			$settingContext = array();
 			if ($contextDepth > 0) {
-				$request = $this->getRequest();
-				$router = $request->getRouter();
-
-				if (is_null($mainContextId)) {
-					// Try to identify the main context (e.g. journal, conference, press),
-					// will be null if none found.
-					$mainContext = $router->getContext($request, 1);
-					if ($mainContext) $mainContextId = $mainContext->getId();
-				}
-
 				// Create the context for the setting if found
-				if (!is_null($mainContextId)) $settingContext[] = $mainContextId;
+				$settingContext[] = $mainContextId;
 				$settingContext = array_pad($settingContext, $contextDepth, 0);
 				$settingContext = array_combine($this->getContextList(), $settingContext);
 			}
 
 			$versionDao = DAORegistry::getDAO('VersionDAO'); /* @var $versionDao VersionDAO */
-			$this->enabledProducts = $versionDao->getCurrentProducts($settingContext);
+			$this->enabledProducts[$mainContextId] = $versionDao->getCurrentProducts($settingContext);
 		}
 
 		if (is_null($category)) {
-			return $this->enabledProducts;
-		} elseif (isset($this->enabledProducts[$category])) {
-			return $this->enabledProducts[$category];
+			return $this->enabledProducts[$mainContextId];
+		} elseif (isset($this->enabledProducts[$mainContextId][$category])) {
+			return $this->enabledProducts[$mainContextId][$category];
 		} else {
 			$returner = array();
 			return $returner;
@@ -370,7 +369,6 @@ abstract class PKPApplication implements iPKPApplicationInfoProvider {
 			'InterestEntryDAO' => 'lib.pkp.classes.user.InterestEntryDAO',
 			'LanguageDAO' => 'lib.pkp.classes.language.LanguageDAO',
 			'LibraryFileDAO' => 'lib.pkp.classes.context.LibraryFileDAO',
-			'MetadataDescriptionDAO' => 'lib.pkp.classes.metadata.MetadataDescriptionDAO',
 			'NavigationMenuDAO' => 'lib.pkp.classes.navigationMenu.NavigationMenuDAO',
 			'NavigationMenuItemDAO' => 'lib.pkp.classes.navigationMenu.NavigationMenuItemDAO',
 			'NavigationMenuItemAssignmentDAO' => 'lib.pkp.classes.navigationMenu.NavigationMenuItemAssignmentDAO',
@@ -535,7 +533,7 @@ abstract class PKPApplication implements iPKPApplicationInfoProvider {
 	/**
 	 * Main entry point for PKP statistics reports.
 	 *
-	 * @see <http://pkp.sfu.ca/wiki/index.php/OJSdeStatisticsConcept#Input_and_Output_Formats_.28Aggregation.2C_Filters.2C_Metrics_Data.29>
+	 * @see <https://pkp.sfu.ca/wiki/index.php/OJSdeStatisticsConcept#Input_and_Output_Formats_.28Aggregation.2C_Filters.2C_Metrics_Data.29>
 	 * for a full specification of the input and output format of this method.
 	 *
 	 * @param $metricType null|string|array metrics selection

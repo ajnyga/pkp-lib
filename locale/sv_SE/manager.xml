@@ -4,8 +4,8 @@
 <!--
   * locale/sv_SE/manager.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   * Localization information: https://pkp.sfu.ca/wiki/index.php?title=OJS:_Swedish_(sv_SE)
   * Localization strings for the sv_SE (Svenska) locale.
@@ -228,48 +228,10 @@
 	<message key="manager.setup.authorCopyrightNoticeAgree">Kräv att författare godkänner upphovsrättsdeklarationen när bidrag skickas in.</message>
 	<message key="manager.setup.authorGuidelines">Riktlinjer för författare</message>
 	<message key="manager.setup.authorGuidelines.description">Rekommenderade riktlinjer inkluderar bibliografi- och formateringsstandarder tillsammans med exempel på vanliga referensformat att använda vid inlämning av bidrag.</message>
-	<message key="manager.setup.citations">Referenser</message>
-	<message key="manager.setup.citationAssistant">Verktyget för referensuppmärkning</message>
-	<message key="manager.setup.citationFilterParser">Extrahering av referenser</message>
-	<message key="manager.setup.citationFilterParserDescription"><![CDATA[<p>För att hitta och kontrollera referenser i referensdatabaser måste de först delas in i maskinläsbara metadata. Titel, förlag, publiceringsdatum, etc. måste hämtas från författarens originaltext. Anslutningar till externa webbtjänster kan hjälpa till med detta. En eller flera anslutningar kan läggas till genom att klicka på knappen "Lägg till objekt" nedan. Några av dessa anslutningar kan behöva konfigureras; du meddelas om så är fallet.</p>
-		<p>Du kan ändra eller ta bort en existerande anslutning genom att klicka på kugghjulet bredvid.</p>]]></message>
-	<message key="manager.setup.citationFilterLookup">Referenskontrollering</message>
-	<message key="manager.setup.citationFilterLookupDescription"><![CDATA[<p>Du måste också aktivera och konfigurera anslutningar till externa referensdatabaser. Det hjälper dig att hitta fel i författarens referenser eller lägga till ytterligare information (t.ex. DOI eller PubMed-ID) som krävs för elektronisk publicering eller arkivering.</p>
-		<p>Vi tillhandahåller anslutningar till flera externa databaser där du kan söka efter referenser. Några av dessa databaser kräver registrering eller att ytterligare information fylls i. Vänligen se databasernas respektive webbsida för mer information om hur du registrerar dig. Du kan lägga till en eller flera databaser genom att klicka på knappen "Lägg till objekt" nedan.</p>
-		<p>Du kan ändra eller ta bort en existerande extern databasanslutning genom att klicka på kugghjulet bredvid.</p>
-		<p><strong>Notera:</strong> För att referenskontrollen ska avslutas inom rimlig tid måste <tt>citation_checking_max_processes</tt>-direktivet i din konfigurationsfil vara inställd på ett rimligt värde. Se sektionen General settings i <tt>config.inc.php</tt> för mer information.</p>]]></message>
 	<message key="manager.setup.competingInterests">Intressekonflikter</message>
 	<message key="manager.setup.competingInterestsDescription">Granskare kommer att bli ombedda att acceptera policyn för intressekonflikter som du specificerar nedan.</message> <!-- FIXME #6843 (JM): should this just reference reviewers? -->
 	<message key="manager.setup.errorDeletingItem">Ett fel uppstod vid borttagning av detta objekt.</message>
 	<message key="manager.setup.favicon">Ogiltigt format för addressikon. Format som accepteras är .ico, .png, and .gif.</message>
-	<message key="manager.setup.filter.grid.errorDeletingFilter">Ett fel uppstod när filtret skulle tas bort. Rapportera gärna detta som en bugg.</message>
-	<message key="manager.setup.filter.grid.filterDisplayName">Anslutning</message>
-	<message key="manager.setup.filter.grid.filterSettings">Registreringsinformation och anslutningsinställningar</message>
-	<message key="manager.setup.filter.grid.filterTemplateRequired">Vänligen välj en av förändringarna från rullgardinsmenyn.</message>
-	<message key="manager.setup.filter.grid.confirmDelete">Vill du verkligen ta bort filtret {$filterName}?</message>
-	<message key="manager.setup.filter.lookup.grid.descriptionConfirm">Du har valt att lägga till databasen {$filterDisplayName}. Tryck 'OK' för att bekräfta.</message>
-	<message key="manager.setup.filter.lookup.grid.descriptionTemplate">Välj en uppslagsdatabas.</message>
-	<message key="manager.setup.filter.lookup.grid.description.iSBNdb"><![CDATA[<p>Det här filtret är kopplat till <a href="http://isbndb.com/" target="_blank">ISBNdb.com</a>s ISBN-databas.</p>
-	<p>En ISBNdb API-nyckel krävs. För information om generering av nyckel, se <a href="http://isbndb.com/api/v1/docs/keys" target="_blank"></a>.</p>]]></message>
-	<message key="manager.setup.filter.lookup.grid.description.crossRef"><![CDATA[<p>Det här filtret är kopplat till referensdatabasen CrossRef med hjälp av CrossRefs <a href="http://www.crossref.org/02publishers/openurl_info.html" target="_blank">OpenURL Query Interface</a>.</p>
-	<p>För att använda detta filter, använd ditt CrossRef-konto eller registrera en giltig e-postadress hos CrossRef <a href="http://www.crossref.org/requestaccount/" target="_blank">här</a>.</p>]]></message>
-	<message key="manager.setup.filter.lookup.grid.description.pubMed"><![CDATA[<p>Det här filtret är kopplat till PubMeds <a href="http://www.ncbi.nlm.nih.gov/gquery/gquery.fcgi" target="_blank">Entrez</a> cross-database söktjänst.</p>
-	<p>En registrerad e-post är inte obligatoriskt, men kan vara nödvändigt om du får anslutningsproblem. Se sektionen <a href="http://www.be-md.ncbi.nlm.nih.gov/bookshelf/br.fcgi?book=helpeutils&part=chapter2#chapter2.Usage_Guidelines_and_Requiremen" target="_blank">Usage Guidelines and Requirements</a> i Entrez dokumentation för mer information.</p>]]></message>
-	<message key="manager.setup.filter.lookup.grid.description.worldCat"><![CDATA[<p>Det här filtret är kopplat till OCLCs tjänster <a href="http://www.worldcat.org/affiliate/webservices/xisbn/app.jsp" target="_blank">xISBN</a> och <a href="http://www.worldcat.org/" target="_blank">Worldcat</a> (valfritt).</p>
-	<p>Om du har en Worldcat <a href="http://oclc.org/developer/develop/web-services.html" target="_blank">API-nyckel</a> kan du ansluta till WorldCat genom att fylla i den nedan.</p>]]></message>
-	<message key="manager.setup.filter.lookup.grid.loadMessage">Vänta tills referensdatabasens konfiguration har laddat...</message>
-	<message key="manager.setup.filter.lookup.grid.title">Anslutningar till referensdatabaser</message>
-	<message key="manager.setup.filter.noMoreTemplates">Alla tillgängliga förändringar har redan lagts till. Klicka på 'Avbryt' för att gå tillbaka till sidan för inställningar.</message>
-	<message key="manager.setup.filter.parser.grid.descriptionConfirm">Du har valt att lägga till parsern {$filterDisplayName}. Klicka 'OK' för att bekräfta.</message>
-	<message key="manager.setup.filter.parser.grid.descriptionTemplate">Välj en referens-parser.</message>
-	<message key="manager.setup.filter.parser.grid.description.freeCite"><![CDATA[<p>Det här extraheringsfiltret använder webbtjänsten <a href="http://freecite.library.brown.edu/" target="_blank">FreeCite</a>.</p>]]></message>
-	<message key="manager.setup.filter.parser.grid.description.paraCite"><![CDATA[<p>Det här extraheringsfiltret använder <a href="http://paracite.eprints.org/developers/" target="_blank">ParaTools</a> Perl-moduler för att tillhandahålla <a href="http://paracite.eprints.org" target="_blank">ParaCite</a> referensparsing-funktionalitet. För att det ska fungera korrekt måste du ha Perl installerat, tillsammans med <a href="http://search.cpan.org/~mjewell/Biblio-Citation-Parser-1.10/" target="_blank">Biblio::Citation::Parser</a> och <a href="http://search.cpan.org/~sburke/Text-Unidecode-0.04/" target="_blank">Text::Unidecode</a> CPAN-moduler. Du behöver också ha konfigurerat <tt>perl</tt> direktivet i din konfigurationsfil. Direktivet hittas i sektionen External Commands i <tt>config.inc.php</tt>.</p>
-	<p>Du kan också välja vilken parser-modul ParaTools ska använda. Du kan välja mellan standard, <a href="http://search.cpan.org/~mjewell/Biblio-Citation-Parser-1.10/lib/Biblio/Citation/Parser/Jiao.pm" target="_blank">Jiao</a>, och <a href="http://search.cpan.org/~mjewell/Biblio-Citation-Parser-1.10/lib/Biblio/Citation/Parser/Citebase.pm" target="_blank">Citebase</a> parser-moduler.</p>]]></message>
-	<message key="manager.setup.filter.parser.grid.description.parsCit"><![CDATA[<p>Det här extraheringsfiltret använder sig av webbtjänsten <a href="http://aye.comp.nus.edu.sg/parsCit/" target="_blank">ParsCit</a>.</p>]]></message>
-	<message key="manager.setup.filter.parser.grid.description.regEx">Extraheringsfiltret RegEx använder en serie reguljära uttryck för att tolka referenser.</message>
-	<message key="manager.setup.filter.parser.grid.loadMessage">Vänta tills referens-parserns konfigurationer har laddat...</message>
-	<message key="manager.setup.filter.parser.grid.title">Tjänster för extrahering av referenser</message>
-	<message key="manager.setup.filter.pleaseSelect">Välj...</message>
 	<message key="manager.setup.groupType">Gruppering av filtyper</message>
 	<message key="manager.setup.homeHeaderImageInvalid">Ogiltigt format för logotyp på förstasidans sidhuvud, eller misslyckad uppladdning. Godkända format är .gif, .jpg, och .png.</message>
 	<message key="manager.setup.homepageImage">Bild på förstasidan</message>
@@ -284,7 +246,6 @@
 	<message key="manager.setup.layout.unselected">Ej vald</message>
 	<message key="manager.setup.loggingAndAuditing">Loggning och revidering</message>
 	<message key="manager.setup.logo">Logotyp</message>
-	<message key="manager.setup.metaCitationsDescription">Kryssa i följande ruta för att aktivera citat- och referensredigering. Det här gör att författare kan inkludera oredigerade referenser till sina bidrag. Redaktörer kommer också att få tillgång till ett verktyg för referensuppmärkning som kan kontrollera oredigerade referenser mot externa databaser, som WorldCat, ISBNdb, PubMed och andra. Godkända referenser kan exporteras till publiceringsversion.</message>
 	<message key="manager.setup.notifications">Avisering om bidrag från författare</message>
 	<message key="manager.setup.notifications.copySpecifiedAddress">Skicka en kopia till den här e-postadressen</message>
 	<message key="manager.setup.notifications.description">Författare får automatiskt ett e-postmeddelande som bekräftar deras inskickade bidrag. Du kan få kopior av detta meddelande skickade till följande:</message>
@@ -306,7 +267,6 @@
 	<message key="manager.setup.reviewOptions.remindForSubmit">Skicka en påminnelse om granskaren inte har lämnat en rekommendation inom följande antal dagar efter deadline:</message>
 	<message key="manager.setup.reviewOptions.reviewTime">Default-deadlines för granskning</message>
 	<message key="manager.setup.reviewOptions.showBlindReviewLink">Visa en länk till "Att garantera anonym granskning" vid uppladdning</message>
-	<message key="manager.setup.sortableByComponent">Kan sorteras efter komponent</message>
 	<message key="manager.setup.sponsors.note">Sponsorrelation och policybeskrivning</message>
 	<message key="manager.setup.sponsors.description">Exempel: vetenskapliga organisationer, universitetsinstitutioner, kooperativ etc. Sponsorer visas publikt.</message>
 	<message key="manager.setup.styleSheetDescription">Erfarna webbutvecklare kan ladda upp en CSS-fil för att ytterligare anpassa webbplatsens utseende.</message>
@@ -321,11 +281,7 @@
 	<message key="plugins.categories.auth">Autentiserings-plugins</message>
 	<message key="plugins.categories.blocks">Block-plugins</message>
 	<message key="plugins.categories.blocks.description">Block är komponenter av användargränssnittet, t.ex. de olika verktygen i sidomenyn.</message>
-	<message key="plugins.categories.citationLookup">Plugins för koppling till referensdatabaser</message>
-	<message key="plugins.categories.citationLookup.description">Plugins för koppling till referensdatabaser ansluter till referensdatabaser för att kontrollera referenser, t.ex. vid redigering av referenser.</message>
-	<message key="plugins.categories.citationParser">Plugins för extrahering av referenser</message>
-	<message key="plugins.categories.citationParser.description">Plugins för extrahering av referenser extraherar data på fältnivå från oredigerade referenser (t.ex. författare, titel etc.).</message>
-	<message key="plugins.categories.gateways.description">Gateway-insticksmoduler tillhandahåller live-data till externa system.</message>
+	<message key="plugins.categories.gateways.description">Gateway-plugins tillhandahåller live-data till externa system.</message>
 	<message key="plugins.categories.gateways">Gateway-plugins</message>
 	<message key="plugins.categories.generic">Allmänna plugins</message>
 	<message key="plugins.categories.importexport.description">Import/export-plugins kan användas för att överföra innehåll från och till andra system.</message>
@@ -342,63 +298,63 @@
 	<message key="plugins.categories.pubIds.description">De här pluginsen implementerar stöd för publika identifikatorer.</message>
 
 	<!-- Plugin management -->
-	<message key="manager.plugins.copyError">Insticksmodulen kopierades inte. Detta kan bero på problem med behörigheter. Se till att webbservern kan skriva till katalogen för insticksmoduler (underkataloger inkluderade) men glöm inte att säkra den igen.</message>
-	<message key="manager.plugins.delete">Ta bort insticksmodul</message>
-	<message key="manager.plugins.installConfirm">Är du säker på att du vill installera den här insticksmodulen?</message>
-	<message key="manager.plugins.upgradeConfirm">Är du säker på att du vill uppgradera den här insticksmodulen?</message>
-	<message key="grid.action.installPlugin">Installera eller uppgradera den här insticksmodulen</message>
-	<message key="manager.plugins.deleteConfirm">Är du säker på att du vill ta bort den här insticksmodulen från systemet?</message>
-	<message key="manager.plugins.deleteDescription">När du trycker på Ta bort kommer du att ta bort insticksmodulen från servern.</message>
-	<message key="manager.plugins.deleteError">Insticksmodulen "{$pluginName}" kunde inte tas bort från filsystemet. Detta kan bero på problem med behörigheter. Se till att webbservern kan skriva till katalogen för insticksmoduler (underkataloger inkluderade) men glöm inte att säkra den igen.</message>
-	<message key="manager.plugins.deleteSuccess">Insticksmodulen "{$pluginName}" togs bort</message>
-	<message key="manager.plugins.description">Den här sidan gör det möjligt för den ansvariga att granska och eventuellt konfigurera de installerade insticksmodulerna. Insticksmodulerna är uppdelade i kategorier efter funktion. Kategorierna listas nedan och i varje kategori återfinns insticksmodulerna.</message>
-	<message key="manager.plugins.doesNotExist">Insticksmodulen "{$pluginName}" finns inte</message>
+	<message key="manager.plugins.copyError">Pluginet kopierades inte. Detta kan bero på problem med behörigheter. Se till att webbservern kan skriva till katalogen för plugins (underkataloger inkluderade) men glöm inte att säkra den igen.</message>
+	<message key="manager.plugins.delete">Ta bort plugin</message>
+	<message key="manager.plugins.installConfirm">Är du säker på att du vill installera det här pluginet?</message>
+	<message key="manager.plugins.upgradeConfirm">Är du säker på att du vill uppgradera det här pluginet?</message>
+	<message key="grid.action.installPlugin">Installera eller uppgradera det här pluginet</message>
+	<message key="manager.plugins.deleteConfirm">Är du säker på att du vill ta bort det här pluginet från systemet?</message>
+	<message key="manager.plugins.deleteDescription">När du trycker på Ta bort kommer du att ta bort pluginet från servern.</message>
+	<message key="manager.plugins.deleteError">Pluginet "{$pluginName}" kunde inte tas bort från filsystemet. Detta kan bero på problem med behörigheter. Se till att webbservern kan skriva till katalogen för plugins (underkataloger inkluderade) men glöm inte att säkra den igen.</message>
+	<message key="manager.plugins.deleteSuccess">Pluginet "{$pluginName}" togs bort</message>
+	<message key="manager.plugins.description">Den här sidan gör det möjligt för den ansvariga att granska och eventuellt konfigurera de installerade pluginen. Pluginen är uppdelade i kategorier efter funktion. Kategorierna listas nedan och i varje kategori ligger pluginen.</message>
+	<message key="manager.plugins.doesNotExist">Pluginet "{$pluginName}" finns inte</message>
 	<message key="manager.plugins.fileSelectError">Välj först en fil</message>
-	<message key="manager.plugins.upload">Ladda upp en ny insticksmodul</message>
-	<message key="manager.plugins.uploadDescription">Det här formuläret tillåter dig att ladda upp och installera en ny insticksmodul. Se till att insticksmodulen är komprimerad till en .tar.gz-fil.</message>
+	<message key="manager.plugins.upload">Ladda upp ett nytt plugin</message>
+	<message key="manager.plugins.uploadDescription">Det här formuläret tillåter dig att ladda upp och installera ett nytt plugin. Se till att pluginet är komprimerat till en .tar.gz-fil.</message>
 	<message key="manager.plugins.uploadFailed">Se till att en fil för uppladdning valts.</message>
-	<message key="manager.plugins.installed">Installerade insticksmoduler</message>
-	<message key="manager.plugins.pluginGallery">Galleri för insticksmoduler</message>
+	<message key="manager.plugins.installed">Installerade plugin</message>
+	<message key="manager.plugins.pluginGallery">Galleri för plugins</message>
 	<message key="manager.plugins.pluginGallery.overview">Översikt</message>
 	<message key="manager.plugins.pluginGallery.installation">Installation</message>
 	<message key="manager.plugins.pluginGallery.latestCompatible">Senaste kompatibla releasen</message>
 	<message key="manager.plugins.pluginGallery.certifications.official">Officiell</message>
-	<message key="manager.plugins.pluginGallery.certifications.official.description">Den här insticksmodulen är utvecklad och underhålls av Public Knowledge Project.</message>
+	<message key="manager.plugins.pluginGallery.certifications.official.description">Det här pluginet är utvecklat och underhålls av Public Knowledge Project.</message>
 	<message key="manager.plugins.pluginGallery.certifications.reviewed">Granskad</message>
-	<message key="manager.plugins.pluginGallery.certifications.reviewed.description">Den här insticksmodulen har granskats och godkänts av Public Knowledge Project.</message>
+	<message key="manager.plugins.pluginGallery.certifications.reviewed.description">Det här pluginet har granskats och godkänts av Public Knowledge Project.</message>
 	<message key="manager.plugins.pluginGallery.certifications.partner">Partner</message>
-	<message key="manager.plugins.pluginGallery.certifications.partner.description">Den här insticksmodulen tillhandahålls av en av våra utvecklingspartners.</message>
+	<message key="manager.plugins.pluginGallery.certifications.partner.description">Det här pluginet tillhandahålls av en av våra utvecklingspartners.</message>
 	<message key="manager.plugins.pluginGallery.maintainer">Ansvarig</message>
 	<message key="manager.plugins.pluginGallery.version">v{$version} släpptes {$date}</message>
 	<message key="manager.plugins.pluginGallery.homepage">Webbplats</message>
 	<message key="manager.plugins.pluginGallery.summary">Sammanfattning</message>
 	<message key="manager.plugins.pluginGallery.status">Status</message>
-	<message key="manager.plugins.noInstalledVersion">Den här insticksmodulen har inte installerats ännu.</message>
-	<message key="manager.plugins.noCompatibleVersion">För närvarande finns ingen kompatibel version av insticksmodulen tillgänglig.</message>
-	<message key="manager.plugins.installedVersionNewer">Insticksmodulen har redan installerats och är nyare än den version som finns tillgänglig i galleriet.</message>
-	<message key="manager.plugins.installedVersionOlder">Insticksmodulen har redan installerats men kan uppdateras till en nyare version.</message>
-	<message key="manager.plugins.installedVersionNewest">Insticksmodulen är redan installerad och aktuell.</message>
+	<message key="manager.plugins.noInstalledVersion">Det här pluginet har inte installerats ännu.</message>
+	<message key="manager.plugins.noCompatibleVersion">För närvarande finns ingen kompatibel version av pluginet tillgänglig.</message>
+	<message key="manager.plugins.installedVersionNewer">Pluginet har redan installerats och är nyare än den version som finns tillgänglig i galleriet.</message>
+	<message key="manager.plugins.installedVersionOlder">Pluginet har redan installerats men kan uppdateras till en nyare version.</message>
+	<message key="manager.plugins.installedVersionNewest">Pluginet är redan installerat och uppdaterat.</message>
 	<message key="manager.plugins.installedVersionNewer.short">Nyare än tillgänglig version</message>
 	<message key="manager.plugins.installedVersionOlder.short">Kan uppgraderas</message>
 	<message key="manager.plugins.installedVersionNewest.short">Aktuell</message>
 	<message key="manager.plugins.noCompatibleVersion.short">Inte tillgänglig</message>
 	<message key="manager.plugins.installFailed">Installation misslyckades. {$errorString}</message>
 	<message key="manager.plugins.installSuccessful">Installation av version {$versionNumber} lyckades</message>
-	<message key="manager.plugins.invalidPluginArchive">Den uppladdade filen innehåller inte en mapp som överensstämmer med insticksmodulens namn.</message>
-	<message key="manager.plugins.wrongCategory">Den uppladdade insticksmodulen passar inte den uppgraderade insticksmodulens kategori</message>
-	<message key="manager.plugins.wrongName">Filen version.xml i den uppladdade insticksmodulen innehåller ett namn som inte stämmer överens med namnet på den uppgraderade insticksmodulen.</message>
-	<message key="manager.plugins.pleaseInstall">Insticksmodulen finns inte. Installera i stället.</message>
-	<message key="manager.plugins.pleaseUpgrade">Insticksmodulen finns redan men är nyare än den installerade versionen. Uppgradera i stället.</message>
+	<message key="manager.plugins.invalidPluginArchive">Den uppladdade filen innehåller inte en mapp som överensstämmer med pluginets namn.</message>
+	<message key="manager.plugins.wrongCategory">Det uppladdade pluginet passar inte det uppgraderade pluginets kategori</message>
+	<message key="manager.plugins.wrongName">Filen version.xml i det uppladdade pluginet innehåller ett namn som inte stämmer överens med namnet på det uppgraderade pluginet.</message>
+	<message key="manager.plugins.pleaseInstall">Pluginet finns inte. Installera i stället.</message>
+	<message key="manager.plugins.pleaseUpgrade">Pluginet finns redan men är nyare än den installerade versionen. Uppgradera i stället.</message>
 	<message key="manager.plugins.settings">Inställningar</message>
 	<message key="manager.plugins.tarCommandNotFound">Kommandot tar är inte tillgängligt. Konfigurera det korrekt i "config.inc.php".</message>
-	<message key="manager.plugins.upgrade">Uppgradera insticksmodul</message>
-	<message key="manager.plugins.upgradeDescription">Det här formuläret tillåter dig att uppgradera en insticksmodul. Se till att insticksmodulen är komprimerad till en .tar.gz-fil.</message>
+	<message key="manager.plugins.upgrade">Uppgradera plugin</message>
+	<message key="manager.plugins.upgradeDescription">Det här formuläret tillåter dig att uppgradera ett plugin. Se till att pluginet är komprimerat till en .tar.gz-fil.</message>
 	<message key="manager.plugins.upgradeFailed">Uppgradering misslyckades. {$errorString}</message>
 	<message key="manager.plugins.upgradeSuccessful">Uppgradering till version {$versionString} lyckades</message>
 	<message key="manager.plugins.uploadError">Fel vid uppladdning av fil</message>
 	<message key="manager.plugins.uploadPluginDir">Välj fil</message>
-	<message key="manager.plugins.versionFileInvalid">version.xml i insticksmodulens katalog innehåller ogiltiga data.</message>
-	<message key="manager.plugins.versionFileNotFound">version.xml hittades inte i insticksmodulens katalog</message>
+	<message key="manager.plugins.versionFileInvalid">version.xml i pluginkatalogen innehåller ogiltiga data.</message>
+	<message key="manager.plugins.versionFileNotFound">version.xml hittades inte i pluginkatalogen</message>
 
 	<message key="notification.localeEnabled">Språk/region aktiverad.</message>
 	<message key="notification.localeDisabled">Språk/region inaktiverad.</message>
@@ -454,7 +410,6 @@
 	<message key="grid.action.editGenre">Ändra kompontenten</message>
 	<message key="grid.action.deleteGenre">Ta bort kompontenten</message>
 	<message key="grid.action.restoreGenres">Återställ komponenterna till defaultinställningar</message>
-	<message key="manager.setup.genres.sortable">Tillåt filer av den här typen att sorteras efter kapitel</message>
 	<message key="manager.setup.genres.dependent">Markera filer av den här typen som underordnade (t.ex. för att inte listas med publicerat innehåll)</message>
 	<message key="manager.setup.genres.supplementary">Markera filer av den här typen som kompletterande filer (t.ex. inte primärt bidrag)</message>
 	<message key="manager.settings.wizard">Inställningsguide</message>
@@ -558,7 +513,7 @@
 	<message key="manager.navigationMenus.customPage">Anpassad sida</message>
 	<message key="manager.navigationMenus.customPage.description">Skapa en anpassad sida på din webbplats och länka till den från en navigationsmeny.</message>
 	<message key="manager.navigationMenus.remoteUrl">Extern URL</message>
-	<message key="manager.navigationMenus.remoteUrl.description">Länka till vilken URL som helst utanför webbplatsen, till exempel http://pkp.sfu.ca.</message>
+	<message key="manager.navigationMenus.remoteUrl.description">Länka till vilken URL som helst utanför webbplatsen, till exempel https://pkp.sfu.ca.</message>
 	<message key="manager.navigationMenus.about.description">Länka till en sida som visar innehållet i Om tidskriften från Inställningar > Tidskrift</message>
 	<message key="manager.navigationMenus.about.conditionalWarning">Den här länken visas bara om du har fyllt i sektionen Om tidskriften under Inställningar > Tidskrift.</message>
 	<message key="manager.navigationMenus.editorialTeam.description">Länka till en sida som visar innehållet i Redaktionsruta i Inställningar > Tidskrift.</message>

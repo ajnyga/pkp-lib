@@ -8,8 +8,8 @@
 /**
  * @file classes/mail/Mail.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class Mail
@@ -462,6 +462,7 @@ class Mail extends DataObject {
 
 		$mailer = new PHPMailer();
 		$mailer->IsHTML(true);
+		$mailer->Encoding = 'base64';
 		if (Config::getVar('email', 'smtp')) {
 			$mailer->IsSMTP();
 			$mailer->Port = Config::getVar('email', 'smtp_port');
@@ -480,7 +481,7 @@ class Mail extends DataObject {
 		}
 		$mailer->CharSet = Config::getVar('i18n', 'client_charset');
 		if (($t = $this->getContentType()) != null) $mailer->ContentType = $t;
-		$mailer->XMailer = 'Public Knowledge Project Suite v2';
+		$mailer->XMailer = 'Public Knowledge Project Suite v3';
 		$mailer->WordWrap = MAIL_WRAP;
 		foreach ((array) $this->getHeaders() as $header) {
 			$mailer->AddCustomHeader($header['key'], $mailer->SecureHeader($header['content']));

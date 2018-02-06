@@ -1,8 +1,8 @@
 {**
  * templates/controllers/grid/navigationMenus/form/navigationMenuItemsForm.tpl
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * Form to read/create/edit navigation menu Items.
@@ -36,7 +36,7 @@
 		{/fbvFormSection}
 
 		{fbvFormSection id="menuItemTypeSection" title="manager.navigationMenus.form.navigationMenuItemType" for="menuItemType"}
-			{fbvElement type="select" id="menuItemType" from=$navigationMenuItemTypeTitles selected=$menuItemType label="manager.navigationMenus.form.navigationMenuItemTypeMessage" translate=false}
+			{fbvElement type="select" id="menuItemType" required=true from=$navigationMenuItemTypeTitles selected=$menuItemType label="manager.navigationMenus.form.navigationMenuItemTypeMessage" translate=false}
 		{/fbvFormSection}
 
 		{fbvFormSection id="remoteUrlTarget" title="manager.navigationMenus.form.url" for="url" list=true required="true"}
@@ -48,7 +48,7 @@
 				{fbvFormSection title="manager.navigationMenus.form.path" for="path" required="true"}
 					{fbvElement type="text" id="path" value=$path required="true"}
 					<p>
-						{url|replace:"REPLACEME":"%PATH%"|assign:"exampleUrl" router=$smarty.const.ROUTE_PAGE context=$currentContext->getPath() page="navigationMenu" op="view" path="REPLACEME"}
+						{url|replace:"REPLACEME":"%PATH%"|assign:"exampleUrl" router=$smarty.const.ROUTE_PAGE page="REPLACEME"}
 						{translate key="manager.navigationMenus.form.viewInstructions" pagesPath=$exampleUrl}
 					</p>
 				{/fbvFormSection}
@@ -60,7 +60,7 @@
 	{/fbvFormArea}
 
 	{fbvFormSection class="formButtons"}
-		{fbvElement type="submit" class="submitFormButton pkp_helpers_align_left pkp_button_primary" id=$buttonId label="common.save"}
+		{fbvElement type="submit" class="submitFormButton pkp_helpers_align_left pkp_button_primary" id="saveButton" label="common.save"}
 		{assign var=buttonId value="submitFormButton"|concat:"-"|uniqid}
 		{fbvElement type="button" class="pkp_button_link" id="previewButton" label="common.preview"}
 	{/fbvFormSection}

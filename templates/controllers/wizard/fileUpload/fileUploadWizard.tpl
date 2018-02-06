@@ -1,8 +1,8 @@
 {**
  * templates/controllers/wizard/fileUpload/fileUploadWizard.tpl
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * A wizard to add files or revisions of files.
@@ -33,7 +33,7 @@
 
 <div id="fileUploadWizard">
 	<ul>
-		<li><a href="{url op="displayFileUploadForm" submissionId=$submissionId stageId=$stageId uploaderRoles=$uploaderRoles uploaderGroupIds=$uploaderGroupIds fileStage=$fileStage revisionOnly=$revisionOnly reviewRoundId=$reviewRoundId revisedFileId=$revisedFileId assocType=$assocType assocId=$assocId dependentFilesOnly=$dependentFilesOnly}">{translate key="submission.submit.uploadStep"}</a></li>
+		<li><a href="{url op="displayFileUploadForm" submissionId=$submissionId stageId=$stageId uploaderRoles=$uploaderRoles fileStage=$fileStage revisionOnly=$revisionOnly reviewRoundId=$reviewRoundId revisedFileId=$revisedFileId assocType=$assocType assocId=$assocId dependentFilesOnly=$dependentFilesOnly}">{translate key="submission.submit.uploadStep"}</a></li>
 		<li><a href="metadata">{translate key="submission.submit.metadataStep"}</a></li>
 		<li><a href="finish">{translate key="submission.submit.finishingUpStep"}</a></li>
 	</ul>

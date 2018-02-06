@@ -3,8 +3,8 @@
 /**
  * @file classes/mail/EmailTemplateDAO.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class EmailTemplateDAO
@@ -494,8 +494,9 @@ class EmailTemplateDAO extends DAO {
 		$result->Close();
 
 		// Sort all templates by email key.
-		$compare = create_function('$t1, $t2', 'return strcmp($t1->getEmailKey(), $t2->getEmailKey());');
-		usort ($emailTemplates, $compare);
+		usort ($emailTemplates, function($t1, $t2) {
+			return strcmp($t1->getEmailKey(), $t2->getEmailKey());
+		});
 
 		return $emailTemplates;
 	}

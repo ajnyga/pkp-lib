@@ -3,8 +3,8 @@
 /**
  * @file controllers/wizard/fileUpload/FileUploadWizardHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class FileUploadWizardHandler
@@ -26,9 +26,6 @@ class PKPFileUploadWizardHandler extends Handler {
 
 	/** @var array */
 	var $_uploaderRoles;
-
-	/** @var array */
-	var $_uploaderGroupIds;
 
 	/** @var boolean */
 	var $_revisionOnly;
@@ -83,17 +80,6 @@ class PKPFileUploadWizardHandler extends Handler {
 			foreach($uploaderRoles as $uploaderRole) {
 				if (!is_numeric($uploaderRole)) fatalError('Invalid uploader role!');
 				$this->_uploaderRoles[] = (int)$uploaderRole;
-			}
-		}
-
-		// Set the uploader group IDs (if given).
-		$uploaderGroupIds = $request->getUserVar('uploaderGroupIds');
-		if (!empty($uploaderGroupIds)) {
-			$this->_uploaderGroupIds = array();
-			$uploaderGroupIds = explode('-', $uploaderGroupIds);
-			foreach($uploaderGroupIds as $uploaderGroupId) {
-				if (!is_numeric($uploaderGroupId)) fatalError('Invalid uploader group ID!');
-				$this->_uploaderGroupIds[] = (int)$uploaderGroupId;
 			}
 		}
 
@@ -167,14 +153,6 @@ class PKPFileUploadWizardHandler extends Handler {
 	}
 
 	/**
-	 * Get the uploader group IDs.
-	 * @return array
-	 */
-	function getUploaderGroupIds() {
-		return $this->_uploaderGroupIds;
-	}
-
-	/**
 	 * Does this uploader only allow revisions and no new files?
 	 * @return boolean
 	 */
@@ -230,7 +208,6 @@ class PKPFileUploadWizardHandler extends Handler {
 			'submissionId' => $this->getSubmission()->getId(),
 			'stageId' => $this->getStageId(),
 			'uploaderRoles' => implode('-', (array) $this->getUploaderRoles()),
-			'uploaderGroupIds' => implode('-', (array) $this->getUploaderGroupIds()),
 			'fileStage' => $this->getFileStage(),
 			'isReviewer' => $request->getUserVar('isReviewer'),
 			'revisionOnly' => $this->getRevisionOnly(),
@@ -254,7 +231,7 @@ class PKPFileUploadWizardHandler extends Handler {
 		import('lib.pkp.controllers.wizard.fileUpload.form.SubmissionFilesUploadForm');
 		$submission = $this->getSubmission();
 		$fileForm = new SubmissionFilesUploadForm(
-			$request, $submission->getId(), $this->getStageId(), $this->getUploaderRoles(), $this->getUploaderGroupIds(), $this->getFileStage(),
+			$request, $submission->getId(), $this->getStageId(), $this->getUploaderRoles(), $this->getFileStage(),
 			$this->getRevisionOnly(), $this->getReviewRound(), $this->getRevisedFileId(),
 			$this->getAssocType(), $this->getAssocId()
 		);
@@ -275,7 +252,7 @@ class PKPFileUploadWizardHandler extends Handler {
 		$submission = $this->getSubmission();
 		import('lib.pkp.controllers.wizard.fileUpload.form.SubmissionFilesUploadForm');
 		$uploadForm = new SubmissionFilesUploadForm(
-			$request, $submission->getId(), $this->getStageId(), null, null, $this->getFileStage(),
+			$request, $submission->getId(), $this->getStageId(), null, $this->getFileStage(),
 			$this->getRevisionOnly(), $this->getReviewRound(), null, $this->getAssocType(), $this->getAssocId()
 		);
 		$uploadForm->readInputData();
@@ -378,9 +355,13 @@ class PKPFileUploadWizardHandler extends Handler {
 		// Validate the form and revise the file.
 		if ($confirmationForm->validate($request)) {
 			if (is_a($uploadedFile = $confirmationForm->execute($request), 'SubmissionFile')) {
+
+				$this->_attachEntities($uploadedFile);
+
 				// Go to the meta-data editing step.
 				return new JSONMessage(true, '', '0', $this->_getUploadedFileInfo($uploadedFile));
 			} else {
+
 				return new JSONMessage(false, __('common.uploadFailed'));
 			}
 		} else {
@@ -457,7 +438,7 @@ class PKPFileUploadWizardHandler extends Handler {
 		// file stage matches the given file name.
 		$possibleRevisedFileId = null;
 		$matchedPercentage = 0;
-		foreach ($submissionFiles as $submissionFile) { /* @var $submissionFile SubmissionFile */
+		foreach ((array) $submissionFiles as $submissionFile) { /* @var $submissionFile SubmissionFile */
 			// Do not consider the uploaded file itself.
 			if ($uploadedFile->getFileId() == $submissionFile->getFileId()) continue;
 

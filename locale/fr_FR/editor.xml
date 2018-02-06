@@ -4,8 +4,8 @@
 <!--
   * locale/fr_FR/editor.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2003-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2003-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings.
@@ -31,7 +31,7 @@
 	<message key="editor.submission.fileList.includeAllStages">Inclure tous les fichiers de toutes les étapes de production accessibles.</message>
 	<message key="editor.submission.review.currentFiles">{$round}e série d'évaluation des fichiers.</message>
 	<message key="editor.submission.backToSearch">Revenir en mode de recherche simple</message>
-	<message key="editor.review.createReviewer">Créer un nouvel rapporteur</message>
+	<message key="editor.review.createReviewer">Créer un nouveau rapporteur</message>
 	<message key="editor.review.enrollReviewer.short">Enregistrer un rapporteur actuel</message>
 	<message key="editor.submissionReview.reviewType">Type d'évaluation</message>
 	<message key="editor.submissionReview.skipEmail">Ne pas envoyer un courriel à l'auteur</message>
@@ -97,7 +97,6 @@
 	<message key="editor.submission.newRoundDescription">Vous êtes sur le point de créer une nouvelle série d'évaluations pour cette soumission. Les fichiers qui n'ont pas été utilisés dans les autres séries d'évaluations sont indiqués ci-dessous. Par défaut, les rapporteurs de la série d'évaluations précédente ont été sélectionnés pour participer à cette nouvelle série.</message>
 	<message key="editor.article.reviewForms">Formulaires d'évaluation</message>
 	<message key="editor.article.selectReviewForm">Sélectionner un formulaire d'évaluation</message>
-	<message key="editor.article.clearReviewForm">Réinitialiser le formulaire d'évaluation</message>
 	<message key="editor.submission.selectedReviewer">Rapporteur sélectionné</message>
 	<message key="editor.submissionLibrary">Bibliothèque de soumission</message>
 	<message key="editor.submission.selectFiles">Sélectionner les fichiers</message>
@@ -135,4 +134,12 @@
 	<message key="editor.publicIdentificationNumericNotAllowed">Le public identifié comme '{$publicIdentifier}' ne peut être un numéro.</message>
 	<message key="editor.publicIdentificationPatternNotAllowed">Le modèle {$pattern} ne peut pas être utilisé comme public identifié.</message>
 	<message key="editor.review.reviewsAdded">Les rapports ont été ajoutés au corps du mail</message>
+	<message key="editor.submissionReview.sendEmail">Envoyer un mail aux auteurs : {$authorName}</message>
+	<message key="editor.submissionReview.sendEmail.editors">Envoyer un mail aux rédacteurs : {$editorNames}</message>
+	<message key="editor.review.newReviewRound">Nécessite un nouveau cycle d'évaluation</message>
+	<message key="editor.submissionReview.recordRecommendation">Enregistrement de la recommandation éditoriale</message>
+	<message key="editor.submissionReview.recordRecommendation.notifyEditors">Notifier les rédacteurs</message>
+	<message key="editor.submissionReview.recordRecommendation.skipEmail">Ne pas envoyer de mail aux rédacteurs.</message>
+	<message key="editor.submissionReview.recordRecommendation.createDiscussion">Créer une discussion sur cette recommandation.</message>
+	<message key="editor.submissionReview.recordRecommendation.skipDiscussion">Ne pas créer une discussion sur cette recommandation.</message>
 </locale>

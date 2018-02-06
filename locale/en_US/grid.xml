@@ -4,8 +4,8 @@
 <!--
   * locale/en_US/grid.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings.
@@ -18,6 +18,7 @@
 	<message key="grid.noAuditors">No Auditors</message>
 	<message key="grid.remotelyHostedItem">This item is remotely hosted.</message>
 
+	<message key="grid.action.uninstall">Uninstall</message>
 	<message key="grid.action.manageAccess">Manage Access</message>
 	<message key="grid.action.sort">Sort</message>
 	<message key="grid.action.addItem">Add Item</message>
@@ -271,4 +272,5 @@
 	<message key="grid.action.addNavigationMenuItem">Add item</message>
 	<message key="grid.navigationMenus.navigationMenuItems.noneExist">No Navigation Menu Items</message>
 	<message key="grid.navigationMenus.navigationMenu.noneExist">No Navigation Menus</message>
+	<message key="grid.navigationMenus.navigationMenu.selectType">Choose a type...</message>
 </locale>

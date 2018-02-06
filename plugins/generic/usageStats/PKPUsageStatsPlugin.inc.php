@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/usageStats/PKPUsageStatsPlugin.inc.php
  *
- * Copyright (c) 2013-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2013-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PKPUsageStatsPlugin
@@ -87,6 +87,8 @@ class PKPUsageStatsPlugin extends GenericPlugin {
 				// Renew the Opt-Out cookie if present.
 				$request->setCookieVar('usageStats-opt-out', true, time() + 60*60*24*365);
 			}
+
+			$this->_registerTemplateResource();
 
 			$this->displayReaderStatistics();
 		}
@@ -498,7 +500,7 @@ class PKPUsageStatsPlugin extends GenericPlugin {
 		$smarty->assign('chartType', $chartType);
 		$datasetMaxCount = $this->_getPluginSetting($context, 'datasetMaxCount');
 		$smarty->assign('datasetMaxCount', $datasetMaxCount);
-		$metricsHTML = $smarty->fetch($this->getTemplatePath(true) . 'outputBackend.tpl');
+		$metricsHTML = $smarty->fetch($this->getTemplateResourceName() . ':templates/outputBackend.tpl');
 		$output .= $metricsHTML;
 
 		return false;

@@ -4,8 +4,8 @@
 <!--
   * locale/ru_RU/common.xml
   *
-  * Copyright (c) 2014-2017 Simon Fraser University
-  * Copyright (c) 2000-2017 John Willinsky
+  * Copyright (c) 2014-2018 Simon Fraser University
+  * Copyright (c) 2000-2018 John Willinsky
   * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
   *
   * Localization strings for the ru_RU (Русский) locale.
@@ -147,8 +147,8 @@
 	<message key="common.fullscreenOff">Выйти из полноэкранного режима</message>
 	<message key="common.false">Ложь</message>
 	<message key="common.file">Файл</message>
-	<message key="common.file.namingPattern">{$username}, {$userGroup}, {$originalFilename}</message>
-	<message key="common.file.anonymousNamingPattern">{$userGroup}, {$originalFilename}</message>
+	<message key="common.file.namingPattern">{$username}, {$originalFilename}</message>
+	<message key="common.file.anonymousNamingPattern">{$genre}, {$originalFilename}</message>
 	<message key="common.fileName">Имя файла</message>
 	<message key="common.fileSize">Размер файла</message>
 	<message key="common.fileType">Тип файла</message>
@@ -199,6 +199,8 @@
 	<message key="common.or">или</message>
 	<message key="common.other">Прочее</message>
 	<message key="common.overdue">Просрочено</message>
+	<message key="common.pagination">{$start}-{$end} из {$total}</message>
+	<message key="common.pagination.label">Просмотреть другие страницы</message>
 	<message key="common.pageNumber">Страница {$pageNumber}</message>
 	<message key="common.pageHeaderLogo.altText">Логотип верхнего колонтитула страницы</message>
 	<message key="common.percentage">{$percentage}%</message>
@@ -372,6 +374,8 @@
 
 	<!-- Участники этапа -->
 	<message key="stageParticipants.history.messageSent">Уведомление отправлено пользователям.</message>
+	<message key="stageParticipants.notify.startDiscussion">Начать обсуждение</message>
+	<message key="stageParticipants.notify.startDiscussion.description">Начать обсуждение между вами и {$userFullName}.</message>
 	<message key="stageParticipants.notify.chooseMessage">Выберите стандартное сообщение для использования или заполните форму ниже.</message>
 	<message key="stageParticipants.notify.message">Сообщение</message>
 	<message key="stageParticipants.notify.warning">Пожалуйста, убедитесь, что вы заполнили поле сообщения и выбрали хотя бы одного получателя.</message>

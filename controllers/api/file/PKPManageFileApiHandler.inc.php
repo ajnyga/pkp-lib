@@ -3,8 +3,8 @@
 /**
  * @file controllers/api/file/PKPManageFileApiHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2000-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2000-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class PKPManageFileApiHandler
@@ -57,12 +57,6 @@ abstract class PKPManageFileApiHandler extends Handler {
 		$submissionFile = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION_FILE);
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$stageId = $request->getUserVar('stageId');
-		if ($stageId) {
-			// validate the stage id.
-			$stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO');
-			$user = $request->getUser();
-			$stageAssignments = $stageAssignmentDao->getBySubmissionAndStageId($submission->getId(), $stageId, null, $user->getId());
-		}
 
 		assert(isset($submissionFile) && isset($submission)); // Should have been validated already
 
@@ -77,14 +71,11 @@ abstract class PKPManageFileApiHandler extends Handler {
 			$reviewRound = $reviewRoundDao->getBySubmissionFileId($submissionFile->getFileId());
 		}
 
+		// Detach any dependent entities to this file deletion.
+		$this->detachEntities($submissionFile, $submission->getId(), $stageId);
+
 		// Delete the submission file.
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
-
-		// check to see if we need to remove review_round_file associations
-		if (!$stageAssignments->wasEmpty()) {
-			$submissionFileDao->deleteReviewRoundAssignment($submission->getId(), $stageId, $submissionFile->getFileId(), $submissionFile->getRevision());
-		}
-
 		if (!$submissionFileDao->deleteRevisionById($submissionFile->getFileId(), $submissionFile->getRevision(), $submissionFile->getFileStage(), $submission->getId())) return new JSONMessage(false);
 
 		$notificationMgr = new NotificationManager();
@@ -270,6 +261,24 @@ abstract class PKPManageFileApiHandler extends Handler {
 	protected function getUpdateNotifications() {
 		return array(NOTIFICATION_TYPE_PENDING_EXTERNAL_REVISIONS);
 	}
+
+	/**
+	 * Detach any dependent entities to this file upload.
+	 * @param $submissionFile SubmissionFile
+	 * @param $submissionId integer
+	 * @param $stageId integer
+	 */
+	 function detachEntities($submissionFile, $submissionId, $stageId) {
+		switch ($submissionFile->getFileStage()) {
+			case SUBMISSION_FILE_REVIEW_FILE:
+			case SUBMISSION_FILE_REVIEW_ATTACHMENT:
+			case SUBMISSION_FILE_REVIEW_REVISION:
+				// check to see if we need to remove review_round_file associations
+				$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+				$submissionFileDao->deleteReviewRoundAssignment($submissionId, $stageId, $submissionFile->getFileId(), $submissionFile->getRevision());
+		}
+	}
+
 }
 
 ?>

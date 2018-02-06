@@ -3,8 +3,8 @@
 /**
  * @file lib/pkp/classes/handler/APIHandler.inc.php
  *
- * Copyright (c) 2014-2017 Simon Fraser University
- * Copyright (c) 2003-2017 John Willinsky
+ * Copyright (c) 2014-2018 Simon Fraser University
+ * Copyright (c) 2003-2018 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class APIHandler
@@ -12,7 +12,7 @@
  *
  * @brief Base request API handler
  */
-AppLocale::requireComponents(LOCALE_COMPONENT_PKP_API);
+AppLocale::requireComponents(LOCALE_COMPONENT_PKP_API, LOCALE_COMPONENT_APP_API);
 import('lib.pkp.classes.handler.PKPHandler');
 
 use \Slim\App;
