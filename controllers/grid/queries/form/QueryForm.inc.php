@@ -187,7 +187,7 @@ class QueryForm extends Form {
 
 		$query = $this->getQuery();
 		$headNote = $query->getHeadNote();
-
+		
 		$templateMgr = TemplateManager::getManager($request);
 		$templateMgr->assign(array(
 			'isNew' => $this->_isNew,
@@ -237,6 +237,13 @@ class QueryForm extends Form {
 			));
 
 			$queryParticipantsListData = $queryParticipantsList->getConfig();
+
+			// When in review stage, include reviewers depending on the current user
+			if ($query->getStageId() == WORKFLOW_STAGE_ID_EXTERNAL_REVIEW || $query->getStageId() == WORKFLOW_STAGE_ID_INTERNAL_REVIEW) {				
+				$reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+				$reviewerParticipants = getReviewerQueryParticipants($reviewRoundId, $assignments, $request->getUser());
+				$queryParticipantsListData = array_merge($queryParticipantsListData, $reviewerParticipants);
+			}
 
 			$templateMgr->assign(array(
 				'hasParticipants' => count($queryParticipantsListData['collection']['items']),
