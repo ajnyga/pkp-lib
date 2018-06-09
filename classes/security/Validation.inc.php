@@ -68,14 +68,6 @@ class Validation {
 			return false;
 
 		} else {
-
-			// If sessions are created only for logged in users, set a cookie to remember cookie consent
-			if (Config::getVar('general', 'session_limit')) {
-				$application = PKPApplication::getApplication();
-				$request = $application->getRequest();
-				$request->setCookieVar('allowCookies', true, time() + 60*60*24*365);
-			}
-
 			return self::registerUserSession($user, $reason, $remember);
 		}
 	}
@@ -355,21 +347,15 @@ class Validation {
 
 	/**
 	 * Suggest a username given the first and last names.
-	 * @param $givenName string
-	 * @param $familyName string
 	 * @return string
 	 */
-	static function suggestUsername($givenName, $familyName = null) {
+	static function suggestUsername($firstName, $lastName) {
+		$initial = PKPString::substr($firstName, 0, 1);
+
 		import('lib.pkp.classes.core.Transcoder');
 		$transcoder = new Transcoder('UTF-8', 'ASCII', true);
 
-		$name = $givenName;
-		if (!empty($familyName)) {
-			$initial = PKPString::substr($givenName, 0, 1);
-			$name = $initial . $familyName;
-		}
-
-		$suggestion = PKPString::regexp_replace('/[^a-zA-Z0-9_-]/', '', $transcoder->trans(PKPString::strtolower($name)));
+		$suggestion = PKPString::regexp_replace('/[^a-zA-Z0-9_-]/', '', $transcoder->trans(PKPString::strtolower($initial . $lastName)));
 		$userDao = DAORegistry::getDAO('UserDAO');
 		for ($i = ''; $userDao->userExistsByUsername($suggestion . $i); $i++);
 		return $suggestion . $i;
