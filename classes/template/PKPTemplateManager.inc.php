@@ -760,16 +760,16 @@ class PKPTemplateManager extends SmartyBC {
 	/**
 	 * @copydoc Smarty::fetch()
 	 */
-	function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null) {
+	function fetch($template, $cache_id = null, $compile_id = null, $display = false) {
 
 		// If no compile ID was assigned, get one.
 		if (!$compile_id) $compile_id = $this->getCompileId($template);
 
 		// Give hooks an opportunity to override
 		$result = null;
-		if (HookRegistry::call('TemplateManager::fetch', array($this, $template, $cache_id, $compile_id, &$result))) return $result;
+		if ($display == false && HookRegistry::call('TemplateManager::fetch', array($this, $template, $cache_id, $compile_id, &$result))) return $result;
 
-		return parent::fetch($template, $cache_id, $compile_id, $parent);
+		return parent::fetch($template, $cache_id, $compile_id, $display);
 	}
 
 	/**
@@ -820,8 +820,10 @@ class PKPTemplateManager extends SmartyBC {
 
 	/**
 	 * @copydoc Smarty::display()
+	 * @param $template string Template filename (or Smarty resource name)
+	 * @param $sendHeaders boolean True iff content type/cache control headers should be sent
 	 */
-	function display($template = null, $cache_id = null, $compile_id = null, $parent = null) {
+	function display($template, $cache_id = null, $compile_id = null, $sendHeaders = true) {
 		// Give any hooks registered against the TemplateManager
 		// the opportunity to modify behavior; otherwise, display
 		// the template as usual.
@@ -831,15 +833,18 @@ class PKPTemplateManager extends SmartyBC {
 			return;
 		}
 
-		// Explicitly set the character encoding. Required in
-		// case server is using Apache's AddDefaultCharset
-		// directive (which can prevent browser auto-detection
-		// of the proper character set).
-		header('Content-Type: text/html; charset=' . Config::getVar('i18n', 'client_charset'));
-		header('Cache-Control: ' . $this->_cacheability);
+		// If this is the main display call, send headers.
+		if ($sendHeaders) {
+			// Explicitly set the character encoding. Required in
+			// case server is using Apache's AddDefaultCharset
+			// directive (which can prevent browser auto-detection
+			// of the proper character set).
+			header('Content-Type: text/html; charset=' . Config::getVar('i18n', 'client_charset'));
+			header('Cache-Control: ' . $this->_cacheability);
+		}
 
 		// Actually display the template.
-		parent::display($template, $cache_id, $compile_id, $parent);
+		parent::display($template, $cache_id, $compile_id);
 	}
 
 
