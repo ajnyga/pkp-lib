@@ -55,7 +55,7 @@ class Validation {
 		} else {
 			// Validate against user database
 			$rehash = null;
-			$valid = self::verifyPassword($username, $password, $user->getPassword(), $rehash);
+			$valid = Validation::verifyPassword($username, $password, $user->getPassword(), $rehash);
 
 			if ($valid && !empty($rehash)) {
 				// update to new hashing algorithm
@@ -68,6 +68,14 @@ class Validation {
 			return false;
 
 		} else {
+
+			// If sessions are created only for logged in users, set a cookie to remember cookie consent
+			if (Config::getVar('general', 'session_limit')) {
+				$application = PKPApplication::getApplication();
+				$request = $application->getRequest();
+				$request->setCookieVar('allowCookies', true, time() + 60*60*24*365);
+			}
+			
 			return self::registerUserSession($user, $reason, $remember);
 		}
 	}
@@ -81,14 +89,14 @@ class Validation {
 	 * @param string &$rehash if password needs rehash, this variable is used
 	 * @return boolean
 	 */
-	static function verifyPassword($username, $password, $hash, &$rehash) {
+	function verifyPassword($username, $password, $hash, &$rehash) {
 		if (password_needs_rehash($hash, PASSWORD_BCRYPT)) {
 			// update to new hashing algorithm
-			$oldHash = self::encryptCredentials($username, $password, false, true);
+			$oldHash = Validation::encryptCredentials($username, $password, false, true);
 
 			if ($oldHash === $hash) {
 				// update hash
-				$rehash = self::encryptCredentials($username, $password);
+				$rehash = Validation::encryptCredentials($username, $password);
 
 				return true;
 			}
@@ -200,7 +208,7 @@ class Validation {
 			} else {
 				// Validate against user database
 				$rehash = null;
-				$valid = self::verifyPassword($username, $password, $user->getPassword(), $rehash);
+				$valid = Validation::verifyPassword($username, $password, $user->getPassword(), $rehash);
 
 				if ($valid && !empty($rehash)) {
 					// update to new hashing algorithm
@@ -222,7 +230,7 @@ class Validation {
 	 * @return boolean
 	 */
 	static function isAuthorized($roleId, $contextId = 0) {
-		if (!self::isLoggedIn()) {
+		if (!Validation::isLoggedIn()) {
 			return false;
 		}
 
@@ -333,7 +341,7 @@ class Validation {
 	 * @param $hash string
 	 * @return boolean
 	 */
-	static function verifyPasswordResetHash($userId, $hash) {
+	function verifyPasswordResetHash($userId, $hash) {
 		// append ":" to ensure the explode results in at least 2 elements
 		list(, $expiry) = explode(':', $hash . ':');
 
@@ -342,7 +350,7 @@ class Validation {
 			return false;
 		}
 
-		return ($hash === self::generatePasswordResetHash($userId, $expiry));
+		return ($hash === Validation::generatePasswordResetHash($userId, $expiry));
 	}
 
 	/**
@@ -352,10 +360,7 @@ class Validation {
 	static function suggestUsername($firstName, $lastName) {
 		$initial = PKPString::substr($firstName, 0, 1);
 
-		import('lib.pkp.classes.core.Transcoder');
-		$transcoder = new Transcoder('UTF-8', 'ASCII', true);
-
-		$suggestion = PKPString::regexp_replace('/[^a-zA-Z0-9_-]/', '', $transcoder->trans(PKPString::strtolower($initial . $lastName)));
+		$suggestion = PKPString::regexp_replace('/[^a-zA-Z0-9_-]/', '', PKPString::strtolower($initial . $lastName));
 		$userDao = DAORegistry::getDAO('UserDAO');
 		for ($i = ''; $userDao->userExistsByUsername($suggestion . $i); $i++);
 		return $suggestion . $i;
@@ -369,8 +374,11 @@ class Validation {
 		$sessionManager = SessionManager::getManager();
 		$session = $sessionManager->getUserSession();
 
-		$userId = $session->getUserId();
-		return isset($userId) && !empty($userId);
+		if ($session){
+			$userId = $session->getUserId();
+			return isset($userId) && !empty($userId);
+		}
+
 	}
 
 	/**
@@ -380,9 +388,11 @@ class Validation {
 	static function isLoggedInAs() {
 		$sessionManager = SessionManager::getManager();
 		$session = $sessionManager->getUserSession();
-		$signedInAs = $session->getSessionVar('signedInAs');
 
-		return isset($signedInAs) && !empty($signedInAs);
+		if ($session){
+			$signedInAs = $session->getSessionVar('signedInAs');
+			return isset($signedInAs) && !empty($signedInAs);
+		}
 	}
 
 	/**
@@ -390,7 +400,7 @@ class Validation {
 	 * @return boolean
 	 */
 	static function isSiteAdmin() {
-		return self::isAuthorized(ROLE_ID_SITE_ADMIN);
+		return Validation::isAuthorized(ROLE_ID_SITE_ADMIN);
 	}
 
 	/**
@@ -434,3 +444,5 @@ class Validation {
 		return true;
 	}
 }
+
+?>
