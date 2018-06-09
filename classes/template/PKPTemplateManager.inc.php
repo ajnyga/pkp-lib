@@ -1409,11 +1409,7 @@ class PKPTemplateManager extends SmartyBC {
 	 * @return string of HTML
 	 */
 	function smartyCSRF($params, $smarty) {
-		$csrfToken = null;
-		if ($this->_request->getSession()){
-			$csrfToken = $this->_request->getSession()->getCSRFToken();
-		}
-
+		$csrfToken = $this->_request->getSession()->getCSRFToken();
 		switch (isset($params['type'])?$params['type']:null) {
 			case 'raw': return $csrfToken;
 			case 'json': return json_encode($csrfToken);
