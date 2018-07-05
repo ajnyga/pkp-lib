@@ -111,7 +111,7 @@ class PKPSubmissionSubmitStep1Form extends SubmissionSubmitForm {
 				$managerUserGroup = $userGroupDao->getById($managerUserGroupAssignment->getUserGroupId());
 				$userGroupNames[$managerUserGroup->getId()] = $managerUserGroup->getLocalizedName();
 			}
-			$managerGroups = join(__('common.listSeparator'), $userGroupNames);
+			$managerGroups = join(__('common.commaListSeparator'), $userGroupNames);
 			$userGroupNames = array_replace($userGroupNames, $availableUserGroupNames);
 
 			// Set default group to default manager group
@@ -152,11 +152,12 @@ class PKPSubmissionSubmitStep1Form extends SubmissionSubmitForm {
 			$supportedSubmissionLocales = $this->context->getSupportedSubmissionLocales();
 			// Try these locales in order until we find one that's
 			// supported to use as a default.
+			$keys = array_keys($supportedSubmissionLocales);
 			$tryLocales = array(
 				$this->getFormLocale(), // Current form locale
 				AppLocale::getLocale(), // Current UI locale
 				$this->context->getPrimaryLocale(), // Context locale
-				$supportedSubmissionLocales[array_shift(array_keys($supportedSubmissionLocales))] // Fallback: first one on the list
+				$supportedSubmissionLocales[array_shift($keys)] // Fallback: first one on the list
 			);
 			$this->_data = $data;
 			foreach ($tryLocales as $locale) {
