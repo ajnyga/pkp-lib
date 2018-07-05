@@ -79,6 +79,7 @@ class SessionManager {
 					session_destroy();
 				}
 
+
 				// Create new session
 				$this->userSession = $this->sessionDao->newDataObject();
 				$this->userSession->setId($sessionId);
