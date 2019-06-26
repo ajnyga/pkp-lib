@@ -54,6 +54,9 @@
 	{if $submissionId}
 		<input type="hidden" name="submissionId" value="{$submissionId|escape}" />
 	{/if}
+	{if $publicationId}
+		<input type="hidden" name="publicationId" value="{$publicationId|escape}" />
+	{/if}
 	{if $gridId}
 		<input type="hidden" name="gridId" value="{$gridId|escape}" />
 	{/if}

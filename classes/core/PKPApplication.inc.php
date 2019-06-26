@@ -49,6 +49,7 @@ define('ASSOC_TYPE_ACCESSIBLE_WORKFLOW_STAGES',	0x0100008);
 define('ASSOC_TYPE_SUBMISSION',			0x0100009);
 define('ASSOC_TYPE_QUERY',			0x010000a);
 define('ASSOC_TYPE_QUEUED_PAYMENT',		0x010000b);
+define('ASSOC_TYPE_PUBLICATION', 0x010000c);
 
 // Constant used in UsageStats for submission files that are not full texts
 define('ASSOC_TYPE_SUBMISSION_FILE_COUNTER_OTHER', 0x0000213);
@@ -405,6 +406,7 @@ abstract class PKPApplication implements iPKPApplicationInfoProvider {
 			'NotificationSubscriptionSettingsDAO' => 'lib.pkp.classes.notification.NotificationSubscriptionSettingsDAO',
 			'PluginGalleryDAO' => 'lib.pkp.classes.plugins.PluginGalleryDAO',
 			'PluginSettingsDAO' => 'lib.pkp.classes.plugins.PluginSettingsDAO',
+			'PublicationDAO' => 'classes.publication.PublicationDAO',
 			'QueuedPaymentDAO' => 'lib.pkp.classes.payment.QueuedPaymentDAO',
 			'ReviewAssignmentDAO' => 'lib.pkp.classes.submission.reviewAssignment.ReviewAssignmentDAO',
 			'ReviewFilesDAO' => 'lib.pkp.classes.submission.ReviewFilesDAO',

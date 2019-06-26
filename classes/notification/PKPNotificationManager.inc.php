@@ -141,7 +141,7 @@ class PKPNotificationManager extends PKPNotificationOperationManager {
 			case NOTIFICATION_TYPE_REVIEW_ASSIGNMENT:
 				return __('notification.type.reviewAssignment');
 			case NOTIFICATION_TYPE_REVIEW_ASSIGNMENT_UPDATED:
-				return __('notification.type.reviewAssignmentUpdated');	
+				return __('notification.type.reviewAssignmentUpdated');
 			case NOTIFICATION_TYPE_REVIEW_ROUND_STATUS:
 				assert($notification->getAssocType() == ASSOC_TYPE_REVIEW_ROUND && is_numeric($notification->getAssocId()));
 				$reviewRoundDao = DAORegistry::getDAO('ReviewRoundDAO');

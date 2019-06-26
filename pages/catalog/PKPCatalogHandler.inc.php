@@ -71,7 +71,6 @@ class PKPCatalogHandler extends Handler {
 			'count' => $count,
 			'offset' => $offset,
 			'status' => STATUS_PUBLISHED,
-			'returnObject' => SUBMISSION_RETURN_PUBLISHED,
 		);
 		$publishedSubmissions = $submissionService->getMany($params);
 		$total = $submissionService->getMax($params);

@@ -33,10 +33,8 @@
 import('lib.pkp.classes.db.DAO');
 import('lib.pkp.classes.submission.Genre'); // GENRE_CATEGORY_... constants
 import('lib.pkp.classes.plugins.PKPPubIdPluginDAO');
-import('lib.pkp.classes.submission.ISubmissionVersionedDAO');
-import('lib.pkp.classes.submission.SubmissionVersionedDAO');
 
-class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPluginDAO, ISubmissionVersionedDAO {
+class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	/**
 	 * @var array a private list of delegates that provide operations for
 	 *  different SubmissionFile implementations.
@@ -56,7 +54,7 @@ class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPlugin
 	 * @param $submissionId int|null (optional) for validation purposes only
 	 * @return SubmissionFile|null
 	 */
-	function getRevision($fileId, $revision, $fileStage = null, $submissionId = null, $submissionVersion = null) {
+	function getRevision($fileId, $revision, $fileStage = null, $submissionId = null) {
 		if (!($fileId && $revision)) return null;
 		$revisions = $this->_getInternally($submissionId, $fileStage, $fileId, $revision, null, null, null, null, null, false, null, $submissionVersion);
 		return $this->_checkAndReturnRevision($revisions);
@@ -445,8 +443,6 @@ class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPlugin
 		$newFile->setGenreId($revisedFile->getGenreId());
 		$newFile->setAssocType($revisedFile->getAssocType());
 		$newFile->setAssocId($revisedFile->getAssocId());
-		$newFile->setPrevVerAssocId($revisedFile->getPrevVerAssocId());
-		$newFile->setSubmissionVersion($revisedFile->getSubmissionVersion());
 
 		// Update the file in the database.
 		return $this->updateObject($newFile, $previousFileId, $previousRevision);
@@ -659,12 +655,13 @@ class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPlugin
 				sf.file_id AS submission_file_id, sf.revision AS submission_revision,
 				af.file_id AS artwork_file_id, af.revision AS artwork_revision,
 				suf.file_id AS supplementary_file_id, suf.revision AS supplementary_revision,
-				s.locale AS submission_locale,
+				p.locale AS submission_locale,
 				sf.*, af.*, suf.*
 			FROM	submission_files sf
 				LEFT JOIN submission_artwork_files af ON sf.file_id = af.file_id AND sf.revision = af.revision
 				LEFT JOIN submission_supplementary_files suf ON sf.file_id = suf.file_id AND sf.revision = suf.revision
-				LEFT JOIN submissions s ON s.submission_id = sf.submission_id ';
+				LEFT JOIN submissions as s ON s.submission_id = sf.submission_id
+				LEFT JOIN publications p ON s.current_publication_id = p.publication_id ';
 	}
 
 
@@ -899,10 +896,10 @@ class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPlugin
 					AND sf.revision '.($latestOnly ? '>=' : '=').' rrf.revision ';
 		}
 
-		if (!$fileId && !$submissionVersion) {
-			$submissionDao = Application::getSubmissionDAO();
-			$submissionVersion = $submissionDao->getCurrentSubmissionVersionById($submissionId);
-		}
+		// if (!$fileId && !$submissionVersion) {
+		// 	$submissionDao = Application::getSubmissionDAO();
+		// 	$submissionVersion = $submissionDao->getCurrentSubmissionVersionById($submissionId);
+		// }
 
 		// Filter the query.
 		list($filterClause, $params) = $this->_buildFileSelectionFilter(
@@ -1113,29 +1110,6 @@ class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPlugin
 		return $revision;
 	}
 
-	public function newVersion($submissionId) {
-		list($oldVersion, $newVersion) = $this->provideSubmissionVersionsForNewVersion($submissionId);
-
-		$context = Application::get()->getRequest()->getContext();
-
-		$allfiles = $this->getBySubmissionId($submissionId, null, $oldVersion);
-
-		/** @var $file SubmissionFile */
-		foreach ($allfiles as $file) {
-			$file->setIsCurrentSubmissionVersion(false);
-			$this->updateObject($file);
-
-			$newFileId = $this->copyFile($context, $file, $file->getFileStage());
-
-			$submissionFileNew = $this->getRevision($newFileId, 1);
-			$submissionFileNew->setSubmissionVersion($newVersion);
-			$submissionFileNew->setPrevVerAssocId($file->getId());
-			$submissionFileNew->setIsCurrentSubmissionVersion(true);
-
-			$this->updateObject($submissionFileNew);
-		}
-	}
-
 	/**
 	 * Make a copy of the file to the specified file stage
 	 * @param $context Context
@@ -1150,14 +1124,6 @@ class SubmissionFileDAO extends SubmissionVersionedDAO implements PKPPubIdPlugin
 		$revision = $submissionFile->getRevision();
 		list($newFileId, $newRevision) = $submissionFileManager->copyFileToFileStage($fileId, $revision, $fileStage, null, $submissionFile->getViewable());
 		return $newFileId;
-	}
-
-	function getVersioningAssocType() {
-		return ASSOC_TYPE_SUBMISSION_FILE;
-	}
-
-	function getMasterTableName() {
-		return 'submission_files';
 	}
 }
 

@@ -14,9 +14,8 @@
  */
 
 import('lib.pkp.classes.core.DataObject');
-import('lib.pkp.classes.submission.SubmissionVersionedDataObject');
 
-class Representation extends SubmissionVersionedDataObject {
+class Representation extends DataObject {
 	/**
 	 * Constructor.
 	 */
@@ -126,17 +125,19 @@ class Representation extends SubmissionVersionedDataObject {
 	/**
 	 * Get the remote URL at which this representation is retrievable.
 	 * @return string
+	 * @deprecated 3.2.0.0
 	 */
 	function getRemoteURL() {
-		return $this->getData('remoteUrl');
+		return $this->getData('urlRemote');
 	}
 
 	/**
 	 * Set the remote URL for retrieving this representation.
 	 * @param $remoteURL string
+	 * @deprecated 3.2.0.0
 	 */
 	function setRemoteURL($remoteURL) {
-		return $this->setData('remoteUrl', $remoteURL);
+		return $this->setData('urlRemote', $remoteURL);
 	}
 
 	/**
@@ -163,8 +164,7 @@ class Representation extends SubmissionVersionedDataObject {
 			$this->getId(),
 			$this->getSubmissionId(),
 			$fileStage,
-			null,
-			$this->getSubmissionVersion()
+			null
 		);
 	}
 }

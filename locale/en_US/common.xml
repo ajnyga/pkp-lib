@@ -260,6 +260,7 @@
 	<message key="common.status">Status</message>
 	<message key="common.subject">Subject</message>
 	<message key="common.subjects">Subjects</message>
+	<message key="common.submenu">Submenu</message>
 	<message key="common.subtitle">Subtitle</message>
 	<message key="common.suggest">Suggest</message>
 	<message key="common.title">Title</message>
@@ -576,6 +577,7 @@
 	<message key="notification.type.reviewerComment">A reviewer has commented on "{$title}".</message>
 	<message key="notification.signedFile">File considered.</message>
 	<message key="user.authorization.submissionFile">The current user is not authorized to access the specified submission file.</message>
+	<message key="user.authorization.invalidPublication">Invalid publication.</message>
 	<message key="user.authorization.invalidSubmission">Invalid submission.</message>
 	<message key="user.authorization.invalidRepresentation">Invalid representation.</message>
 	<message key="user.authorization.authorRoleMissing">You do not currently have sufficient privileges to view the submission. Please edit your profile to ensure that you have been granted the appropriate roles under "Register As".</message>

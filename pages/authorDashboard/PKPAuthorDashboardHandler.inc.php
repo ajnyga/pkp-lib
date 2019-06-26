@@ -16,7 +16,7 @@
 // Import base class
 import('classes.handler.Handler');
 
-class PKPAuthorDashboardHandler extends Handler {
+abstract class PKPAuthorDashboardHandler extends Handler {
 
 	/**
 	 * Constructor
@@ -62,15 +62,10 @@ class PKPAuthorDashboardHandler extends Handler {
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$templateMgr->assign('submission', $submission);
 
-		// Link actions.
-		import('lib.pkp.controllers.modals.submissionMetadata.linkAction.AuthorViewMetadataLinkAction');
-		$templateMgr->assign('viewMetadataAction', new AuthorViewMetadataLinkAction($request, $submission->getId()));
-
-		import('lib.pkp.controllers.modals.documentLibrary.linkAction.SubmissionLibraryLinkAction');
-		$templateMgr->assign(
-			'submissionLibraryAction',
-			new SubmissionLibraryLinkAction($request, $submission->getId())
-		);
+		$submissionContext = $request->getContext();
+		if ($submission->getContextId() !== $submissionContext->getId()) {
+			$submissionContext = Services::get('context')->get($submission->getContextId());
+		}
 
 		$workflowStages = WorkflowStageDAO::getWorkflowStageKeysAndPaths();
 		$stageNotifications = array();
@@ -87,6 +82,76 @@ class PKPAuthorDashboardHandler extends Handler {
 
 		$workflowStages = WorkflowStageDAO::getStageStatusesBySubmission($submission, $stagesWithDecisions, $stageNotifications);
 		$templateMgr->assign('workflowStages', $workflowStages);
+
+		// Add an upload revisions button when in the review stage
+		// and the last decision is to request revisions
+		$uploadFileUrl = '';
+		if (in_array($submission->getData('stageId'), [WORKFLOW_STAGE_ID_INTERNAL_REVIEW, WORKFLOW_STAGE_ID_EXTERNAL_REVIEW])) {
+			$fileStage = $this->_fileStageFromWorkflowStage($submission->getData('stageId'));
+			$lastReviewRound = DAORegistry::getDAO('ReviewRoundDAO')->getLastReviewRoundBySubmissionId($submission->getId(), $submission->getData('stageId'));
+			if ($fileStage && is_a($lastReviewRound, 'ReviewRound')) {
+				$editorDecisions = DAORegistry::getDAO('EditDecisionDAO')->getEditorDecisions($submission->getId(), $submission->getData('stageId'), $lastReviewRound->getId());
+				if (!empty($editorDecisions) && array_last($editorDecisions)['decision'] == SUBMISSION_EDITOR_DECISION_PENDING_REVISIONS) {
+					$uploadFileUrl = 'http://example.org';
+					// import('lib.pkp.controllers.api.file.linkAction.AddFileLinkAction');
+					// $templateMgr->assign('uploadFileAction', new AddFileLinkAction(
+					// 	$request,
+					// 	$submission->getId(),
+					// 	$submission->getData('stageId'),
+					// 	[ROLE_ID_AUTHOR],
+					// 	$fileStage,
+					// 	null,
+					// 	null,
+					// 	$lastReviewRound->getId()
+					// ));
+				}
+			}
+		}
+
+		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId());
+
+		$contributorsGridUrl = $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'grid.users.author.AuthorGridHandler',
+			'fetchGrid',
+			$submission->getId(),
+			[
+				'submissionId' => $submission->getId(),
+				'publicationId' => '__publicationId__',
+			]
+		);
+
+		$submissionProps = Services::get('submission')->getFullProperties(
+			$submission,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByRoleId($submission->getData('contextId'), ROLE_ID_AUTHOR)->toArray(),
+			]
+		);
+
+		$templateMgr->assign('workflowData', [
+			'components' => [
+
+			],
+			'contributorsGridUrl' => $contributorsGridUrl,
+			'csrfToken' => $request->getSession()->getCSRFToken(),
+			'publicationFormIds' => [
+
+			],
+			'representationsGridUrl' => $this->_getRepresentationsGridUrl($request, $submission),
+			'submission' => $submissionProps,
+			'submissionApiUrl' => $submissionApiUrl,
+			'supportsReferences' => !!$submissionContext->getData('citations'),
+			'uploadFileUrl' => $uploadFileUrl,
+			'i18n' => [
+				'status' => __('semicolon', ['label' => __('common.status')]),
+				'uploadFile' => __('common.upload.addFile'),
+				'view' => __('common.view'),
+				'version' => __('semicolon', ['label' => __('admin.version')]),
+			],
+		]);
 
 		return $templateMgr->display('authorDashboard/authorDashboard.tpl');
 	}
@@ -114,6 +179,25 @@ class PKPAuthorDashboardHandler extends Handler {
 		}
 	}
 
+	/**
+	 * Get the SUBMISSION_FILE_... file stage based on the current
+	 * WORKFLOW_STAGE_... workflow stage.
+	 * @param $currentStage int WORKFLOW_STAGE_...
+	 * @return int SUBMISSION_FILE_...
+	 */
+	protected function _fileStageFromWorkflowStage($currentStage) {
+		switch ($currentStage) {
+			case WORKFLOW_STAGE_ID_SUBMISSION:
+				return SUBMISSION_FILE_SUBMISSION;
+			case WORKFLOW_STAGE_ID_EXTERNAL_REVIEW:
+				return SUBMISSION_FILE_REVIEW_REVISION;
+			case WORKFLOW_STAGE_ID_EDITING:
+				return SUBMISSION_FILE_FINAL;
+			default:
+				return null;
+		}
+	}
+
 
 	//
 	// Protected helper methods
@@ -131,6 +215,15 @@ class PKPAuthorDashboardHandler extends Handler {
 		);
 	}
 
+	/**
+	 * Get the URL for the galley/publication formats grid with a placeholder for
+	 * the publicationId value
+	 *
+	 * @param Request $request
+	 * @param Submission $submission
+	 * @return string
+	 */
+	abstract protected function _getRepresentationsGridUrl($request, $submission);
 }
 
 

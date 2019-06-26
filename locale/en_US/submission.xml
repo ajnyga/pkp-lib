@@ -13,6 +13,8 @@
 
 <locale name="en_US" full_name="U.S. English">
 	<!-- Author Submission -->
+	<message key="author.editPublishedDisabled">The authors of this publication can not be edited because it has already been published.</message>
+	<message key="author.publicationNotFound">The publication for this author could not be found.</message>
 	<message key="author.submit.submissionCitations">Provide a formatted list of references for works cited in this submission. Please separate individual references with a blank line.</message>
 	<message key="author.submission.roundStatus.reviewsReady">New reviews have been submitted and are being considered by the editor.</message>
 	<message key="submission.confirm.message">Your submission has been uploaded and is ready to be sent. You may go back to review and adjust any of the information you have entered before continuing. When you are ready, click "Finish Submission".</message>
@@ -468,7 +470,7 @@
 	<message key="editor.submission.editStageParticipant">Edit Assignment</message>
 	<message key="editor.submission.addStageParticipant.userGroup">Users are assigned to stages of the workflow by user group. Any user assigned to this stage will automatically be assigned to other stages to which their user group has been assigned. This is commonly reserved for editors, authors and translators.</message>
 	<message key="editor.submission.removeStageParticipant">Remove Participant</message>
-	<message key="editor.submission.removeStageParticipant.description"><![CDATA[You are about to remove this participant from <strong>all</strong> stages. If the user also have pending auditor tasks, they will be removed too.]]></message>
+	<message key="editor.submission.removeStageParticipant.description"><![CDATA[You are about to remove this participant from <strong>all</strong> stages.]]></message>
 	<message key="editor.submission.addStageParticipant.form.userGroupRequired">You must select a user group.</message>
 	<message key="editor.submission.addStageParticipant.form.userRequired">You must select a user for the specified user group.</message>
 	<message key="editor.submission.addStageParticipant.form.reviewerWarning">The participant you selected has been assigned to conduct a blind review. If you assign them as a participant, they will have access to the author's identity. You are encouraged not to assign this participant unless you can independently ensure the integrity of the peer review process.</message>
@@ -631,6 +633,7 @@
 	<message key="submission.list.infoCenter">Activity Log &amp; Notes</message>
 	<message key="submission.list.empty">No submissions found.</message>
 	<message key="submission.list.responseDue">Response Due</message>
+	<message key="submission.list.reviewAssignment">Review Assignment</message>
 	<message key="submission.list.reviewDue">Review Due</message>
 	<message key="submission.list.reviewComplete">Review Submitted</message>
 	<message key="submission.list.reviewCancelled">Review Cancelled</message>
@@ -659,10 +662,21 @@
 	<message key="catalog.category.noItems">Nothing has been published in this category yet.</message>
 	<message key="catalog.category.subcategories">Subcategories</message>
 
-	<!-- Versioning -->
-	<message key="submission.production.version">Version {$submissionVersion}</message>
-	<message key="submission.production.newVersion">New Version</message>
-	<message key="submission.production.editMetadata">Metadata of this Version</message>
-	<message key="submission.production.editMetadata.info">This is the metadata of version {$version}.</message>
-	<message key="submission.production.editMetadata.previous">Previous versions can be seen at the corresponding tab at the production stage.</message>
+	<!-- Publication -->
+	<message key="publication.contributors">Contributors</message>
+	<message key="publication.copyrightYearBasis.issueDescription">The copyright year will be set automatically when this is published in an issue.</message>
+	<message key="publication.createVersion">Create New Version</message>
+	<message key="publication.editDisabled">This version has been published and can not be edited.</message>
+	<message key="publication.invalidSubmission">The submission for this publication could not be found.</message>
+	<message key="publication.issueEntry">Issue Entry</message>
+	<message key="publication.publicationLicense">Permissions &amp; Disclosure</message>
+	<message key="publication.publicationLicense.success">The copyright and license information have been updated.</message>
+	<message key="publication.publish">Publish</message>
+	<message key="publication.status.published">Published</message>
+	<message key="publication.status.unpublished">Unpublished</message>
+	<message key="publication.status.unscheduled">Unscheduled</message>
+	<message key="publication.titleAbstract">Title &amp; Abstract</message>
+	<message key="publication.titleAbstract.success">The title and abstract have been updated.</message>
+	<message key="publication.version.all">All Versions</message>
+	<message key="publication.wordCountLong">The abstract is too long. It shoud be {$limit} words or less. It is currently {$count} words long.</message>
 </locale>

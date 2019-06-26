@@ -58,6 +58,8 @@ class PKPSubmissionSubmitStep3Form extends SubmissionSubmitForm {
 			));
 		}
 
+		$templateMgr->assign('publicationId', $this->submission->getCurrentPublication()->getId());
+
 		return parent::fetch($request, $template, $display);
 	}
 

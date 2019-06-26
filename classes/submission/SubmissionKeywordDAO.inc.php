@@ -22,12 +22,12 @@ class SubmissionKeywordDAO extends ControlledVocabDAO {
 
 	/**
 	 * Build/fetch and return a controlled vocabulary for keywords.
-	 * @param $submissionId int
+	 * @param $publicationId int
 	 * @return ControlledVocab
 	 */
-	function build($submissionId) {
+	function build($publicationId) {
 		// may return an array of ControlledVocabs
-		return parent::_build(CONTROLLED_VOCAB_SUBMISSION_KEYWORD, ASSOC_TYPE_SUBMISSION, $submissionId);
+		return parent::_build(CONTROLLED_VOCAB_SUBMISSION_KEYWORD, ASSOC_TYPE_PUBLICATION, $publicationId);
 	}
 
 	/**
@@ -111,22 +111,18 @@ class SubmissionKeywordDAO extends ControlledVocabDAO {
 	/**
 	 * Add an array of keywords
 	 * @param $keywords array
-	 * @param $submissionId int
+	 * @param $publicationId int
 	 * @param $deleteFirst boolean
 	 * @return int
 	 */
-	function insertKeywords($keywords, $submissionId, $deleteFirst = true) {
+	function insertKeywords($keywords, $publicationId, $deleteFirst = true) {
 		$keywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
 		$submissionKeywordEntryDao = DAORegistry::getDAO('SubmissionKeywordEntryDAO');
-		$currentKeywords = $this->build($submissionId);
 
 		if ($deleteFirst) {
-			$existingEntries = $keywordDao->enumerate($currentKeywords->getId(), CONTROLLED_VOCAB_SUBMISSION_KEYWORD);
-
-			foreach ($existingEntries as $id => $entry) {
-				$entry = trim($entry);
-				$submissionKeywordEntryDao->deleteObjectById($id);
-			}
+			$currentKeywords = $this->deleteByPublicationId($publicationId);
+		} else {
+			$currentKeywords = $this->build($publicationId);
 		}
 		if (is_array($keywords)) { // localized, array of arrays
 
@@ -146,6 +142,28 @@ class SubmissionKeywordDAO extends ControlledVocabDAO {
 			}
 		}
 	}
+
+	/**
+	 * Delete keywords by publication ID
+	 *
+	 * @param int $publicationid
+	 * @return int|array Controlled Vocab
+	 */
+	public function deleteByPublicationId($publicationId) {
+		$keywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
+		$submissionKeywordEntryDao = DAORegistry::getDAO('SubmissionKeywordEntryDAO');
+		$currentKeywords = $this->build($publicationId);
+
+		$existingEntries = $keywordDao->enumerate($currentKeywords->getId(), CONTROLLED_VOCAB_SUBMISSION_KEYWORD);
+		foreach ($existingEntries as $id => $entry) {
+			$entry = trim($entry);
+			$entryObj = $submissionKeywordEntryDao->getById($id);
+			$submissionKeywordEntryDao->deleteObjectById($id);
+		}
+
+		return $currentKeywords;
+	}
+
 }
 
 

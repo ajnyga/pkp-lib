@@ -341,17 +341,6 @@ abstract class PKPWorkflowHandler extends Handler {
 	}
 
 	/**
-	 * Fetch the JSON-encoded submission header.
-	 * @param $args array
-	 * @param $request Request
-	 * @return JSONMessage JSON object
-	 */
-	function submissionHeader($args, $request) {
-		$templateMgr = TemplateManager::getManager($request);
-		return $templateMgr->fetchJson('workflow/submissionHeader.tpl');
-	}
-
-	/**
 	 * Fetch the JSON-encoded submission progress bar.
 	 * @param $args array
 	 * @param $request Request
@@ -379,9 +368,6 @@ abstract class PKPWorkflowHandler extends Handler {
 
 		$workflowStages = WorkflowStageDAO::getStageStatusesBySubmission($submission, $stagesWithDecisions, $stageNotifications);
 		$templateMgr->assign('workflowStages', $workflowStages);
-		if ($this->isSubmissionReady($submission)) {
-			$templateMgr->assign('submissionIsReady', true);
-		}
 
 		return $templateMgr->fetchJson('workflow/submissionProgressBar.tpl');
 	}
@@ -392,13 +378,18 @@ abstract class PKPWorkflowHandler extends Handler {
 	 */
 	function setupTemplate($request) {
 		parent::setupTemplate($request);
-		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION, LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_GRID, LOCALE_COMPONENT_PKP_EDITOR);
+		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_ADMIN, LOCALE_COMPONENT_APP_ADMIN, LOCALE_COMPONENT_PKP_MANAGER, LOCALE_COMPONENT_APP_MANAGER, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION, LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_GRID, LOCALE_COMPONENT_PKP_EDITOR);
 
 		$router = $request->getRouter();
 
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$stageId = $this->getAuthorizedContextObject(ASSOC_TYPE_WORKFLOW_STAGE);
 		$accessibleWorkflowStages = $this->getAuthorizedContextObject(ASSOC_TYPE_ACCESSIBLE_WORKFLOW_STAGES);
+
+		$submissionContext = $request->getContext();
+		if ($submission->getContextId() !== $submissionContext->getId()) {
+			$submissionContext = Services::get('context')->get($submission->getContextId());
+		}
 
 		// Construct array with workflow stages data.
 		$workflowStages = WorkflowStageDAO::getWorkflowStageKeysAndPaths();
@@ -434,6 +425,83 @@ abstract class PKPWorkflowHandler extends Handler {
 			'submissionLibraryAction',
 			new SubmissionLibraryLinkAction($request, $submission->getId())
 		);
+
+		// Publication tab
+		$supportedFormLocales = $submissionContext->getSupportedFormLocales();
+		$localeNames = AppLocale::getAllLocales();
+		$locales = array_map(function($localeKey) use ($localeNames) {
+			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
+		}, $supportedFormLocales);
+
+		$latestPublication = $submission->getLatestPublication();
+
+		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId());
+		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
+		$temporaryFileApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getPath(), 'temporaryFiles');
+
+		import('classes.file.PublicFileManager');
+		$publicFileManager = new PublicFileManager();
+		$baseUrl = $request->getBaseUrl() . '/' . $publicFileManager->getContextFilesPath($submissionContext->getId());
+
+		$contributorsGridUrl = $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'grid.users.author.AuthorGridHandler',
+			'fetchGrid',
+			$submission->getId(),
+			[
+				'submissionId' => $submission->getId(),
+				'publicationId' => '__publicationId__',
+			]
+		);
+
+		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
+		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
+		$issueEntryForm = new APP\components\forms\publication\IssueEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
+
+		$templateMgr->setConstants([
+			'FORM_TITLE_ABSTRACT',
+			'FORM_PUBLICATION_LICENSE',
+			'FORM_ISSUE_ENTRY',
+		]);
+
+		$submissionProps = Services::get('submission')->getFullProperties(
+			$submission,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByRoleId($submission->getData('contextId'), ROLE_ID_AUTHOR)->toArray(),
+			]
+		);
+
+		$settingsData = [
+			'components' => [
+				FORM_TITLE_ABSTRACT => $titleAbstractForm->getConfig(),
+				FORM_PUBLICATION_LICENSE => $publicationLicenseForm->getConfig(),
+				FORM_ISSUE_ENTRY => $issueEntryForm->getConfig(),
+			],
+			'contributorsGridUrl' => $contributorsGridUrl,
+			'csrfToken' => $request->getSession()->getCSRFToken(),
+			'publicationFormIds' => [
+				FORM_TITLE_ABSTRACT,
+				FORM_PUBLICATION_LICENSE,
+				FORM_ISSUE_ENTRY,
+			],
+			'representationsGridUrl' => $this->_getRepresentationsGridUrl($request, $submission),
+			'submission' => $submissionProps,
+			'submissionApiUrl' => $submissionApiUrl,
+			'supportsReferences' => !!$submissionContext->getData('citations'),
+			'i18n' => [
+				'preview' => __('common.preview'),
+				'publish' => __('publication.publish'),
+				'schedulePublication' => __('editor.article.schedulePublication'),
+				'status' => __('semicolon', ['label' => __('common.status')]),
+				'view' => __('common.view'),
+				'version' => __('semicolon', ['label' => __('admin.version')]),
+			],
+		];
+
+		$templateMgr->assign('workflowData', $settingsData);
 	}
 
 	//
@@ -522,11 +590,14 @@ abstract class PKPWorkflowHandler extends Handler {
 	abstract protected function getEditorAssignmentNotificationTypeByStageId($stageId);
 
 	/**
-	 * Checks whether or not the submission is ready to appear publicly.
-	 * @param $submission Submission
-	 * @return boolean
+	 * Get the URL for the galley/publication formats grid with a placeholder for
+	 * the publicationId value
+	 *
+	 * @param Request $request
+	 * @param Submission $submission
+	 * @return string
 	 */
-	abstract protected function isSubmissionReady($submission);
+	abstract protected function _getRepresentationsGridUrl($request, $submission);
 }
 
 

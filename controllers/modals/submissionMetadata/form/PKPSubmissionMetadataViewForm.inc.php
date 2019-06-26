@@ -56,15 +56,6 @@ class PKPSubmissionMetadataViewForm extends Form {
 
 		$this->_formParams = $formParams;
 
-		if ($submission->getCurrentSubmissionVersion() != $submission->getSubmissionVersion()) {
-			if (!isset($this->_formParams)) {
-				$this->_formParams = array();
-			}
-
-			$this->_formParams["readOnly"] = true;
-			$this->_formParams["hideSubmit"] = true;
-		}
-
 		$this->_metadataFormImplem = new SubmissionMetadataFormImplementation($this);
 
 		$this->setDefaultFormLocale($submission->getLocale());
@@ -148,7 +139,6 @@ class PKPSubmissionMetadataViewForm extends Form {
 			'submissionId' =>$submission->getId(),
 			'stageId' => $this->getStageId(),
 			'formParams' => $this->getFormParams(),
-			'submissionVersion' => $submission->getSubmissionVersion(),
 		));
 
 		// Tell the form what fields are enabled (and which of those are required)
@@ -173,54 +163,54 @@ class PKPSubmissionMetadataViewForm extends Form {
 			))
 		);
 
-		// Get assigned categories
-		// We need an array of IDs for the SelectListPanel, but we also need an
-		// array of Category objects to use when the metadata form is viewed in
-		// readOnly mode. This mode is invoked on the SubmissionMetadataHandler
-		// is not available here
-		$submissionDao = Application::getSubmissionDAO();
-		$categories = $submissionDao->getCategories($submission->getId(), $submission->getContextId());
-		$assignedCategories = array();
-		$selectedIds = array();
-		while ($category = $categories->next()) {
-			$assignedCategories[] = $category;
-			$selectedIds[] = $category->getId();
-		}
+		// // Get assigned categories
+		// // We need an array of IDs for the SelectListPanel, but we also need an
+		// // array of Category objects to use when the metadata form is viewed in
+		// // readOnly mode. This mode is invoked on the SubmissionMetadataHandler
+		// // is not available here
+		// $submissionDao = Application::getSubmissionDAO();
+		// $categories = $submissionDao->getCategories($submission->getId(), $submission->getContextId());
+		// $assignedCategories = array();
+		// $selectedIds = array();
+		// while ($category = $categories->next()) {
+		// 	$assignedCategories[] = $category;
+		// 	$selectedIds[] = $category->getId();
+		// }
 
-		// Categories list
-		$items = [];
-		$categoryDao = DAORegistry::getDAO('CategoryDAO');
-		$categories = $categoryDao->getByContextId($context->getId());
-		if (!$categories->wasEmpty) {
-			while ($category = $categories->next()) {
-				$items[] = array(
-					'id' => $category->getId(),
-					'title' => $category->getLocalizedTitle(),
-				);
-			}
-		}
+		// // Categories list
+		// $items = [];
+		// $categoryDao = DAORegistry::getDAO('CategoryDAO');
+		// $categories = $categoryDao->getByContextId($context->getId());
+		// if (!$categories->wasEmpty) {
+		// 	while ($category = $categories->next()) {
+		// 		$items[] = array(
+		// 			'id' => $category->getId(),
+		// 			'title' => $category->getLocalizedTitle(),
+		// 		);
+		// 	}
+		// }
 
-		$categoriesList = new \PKP\components\listPanels\ListPanel(
-			'categories',
-			__('grid.category.categories'),
-			[
-				'canSelect' => true,
-				'items' => $items,
-				'itemsMax' => count($items),
-				'selected' => $selectedIds,
-				'selectorName' => 'categories[]',
-			]
-		);
+		// $categoriesList = new \PKP\components\listPanels\ListPanel(
+		// 	'categories',
+		// 	__('grid.category.categories'),
+		// 	[
+		// 		'canSelect' => true,
+		// 		'items' => $items,
+		// 		'itemsMax' => count($items),
+		// 		'selected' => $selectedIds,
+		// 		'selectorName' => 'categories[]',
+		// 	]
+		// );
 
-		$templateMgr->assign(array(
-			'assignedCategories' => $assignedCategories,
-			'hasCategories' => !empty($categoriesList->items),
-			'categoriesListData' => [
-				'components' => [
-					'categories' => $categoriesList->getConfig(),
-				]
-			]
-		));
+		// $templateMgr->assign(array(
+		// 	'assignedCategories' => $assignedCategories,
+		// 	'hasCategories' => !empty($categoriesList->items),
+		// 	'categoriesListData' => [
+		// 		'components' => [
+		// 			'categories' => $categoriesList->getConfig(),
+		// 		]
+		// 	]
+		// ));
 
 		return parent::fetch($request, $template, $display);
 	}
@@ -241,13 +231,13 @@ class PKPSubmissionMetadataViewForm extends Form {
 		// Execute submission metadata related operations.
 		$this->_metadataFormImplem->execute($submission, Application::get()->getRequest());
 
-		$submissionDao = Application::getSubmissionDAO();
-		$submissionDao->removeCategories($submission->getId());
-		if ($this->getData('categories')) {
-			foreach ((array) $this->getData('categories') as $categoryId) {
-				$submissionDao->addCategory($submission->getId(), (int) $categoryId);
-			}
-		}
+		// $submissionDao = Application::getSubmissionDAO();
+		// $submissionDao->removeCategories($submission->getId());
+		// if ($this->getData('categories')) {
+		// 	foreach ((array) $this->getData('categories') as $categoryId) {
+		// 		$submissionDao->addCategory($submission->getId(), (int) $categoryId);
+		// 	}
+		// }
 	}
 
 

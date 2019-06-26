@@ -39,9 +39,28 @@ abstract class SchemaDAO extends DAO {
 	abstract public function newDataObject();
 
 	/**
+	 * Retrieve an object by ID
+	 * @param $objectId int
+	 * @return DataObject
+	 */
+	public function getById($objectId) {
+		$result = $this->retrieve(
+			'SELECT * FROM ' . $this->tableName . ' WHERE ' . $this->primaryKeyColumn . ' = ?',
+			(int) $objectId
+		);
+
+		$returner = null;
+		if ($result->RecordCount() != 0) {
+			$returner = $this->_fromRow($result->GetRowAssoc(false));
+		}
+		$result->Close();
+		return $returner;
+	}
+
+	/**
 	 * Insert a new object
 	 *
-	 * @param $object DataObject The object to insert into the database
+	 * @param DataObject $object The object to insert into the database
 	 * @return int The new object's id
 	 */
 	public function insertObject($object) {
@@ -120,7 +139,7 @@ abstract class SchemaDAO extends DAO {
 
 		$primaryDbProps = [];
 		foreach ($this->primaryTableColumns as $propName => $columnName) {
-			if ($propName !== 'id' && isset($sanitizedProps[$propName])) {
+			if ($propName !== 'id' && array_key_exists($propName, $sanitizedProps)) {
 				$primaryDbProps[$columnName] = $this->convertToDB($sanitizedProps[$propName], $schema->properties->{$propName}->type);
 			}
 		}
