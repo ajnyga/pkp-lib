@@ -157,7 +157,7 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 					);
 					break;
 				case 'isPublished':
-					$values[$prop] = $this->isPublished($publication);
+					$values[$prop] = $this->isPublished($publication, $args);
 					break;
 
 				case 'urlPublished':
@@ -349,6 +349,6 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 	 */
 	public function isPublished($publication, $dependencies = []) {
 		$datePublished = $publication->getData('datePublished');
-		return $datePublished && strtotime($datePublished) < Core::getCurrentDate();
+		return $datePublished && strtotime($datePublished) < strtotime(Core::getCurrentDate());
 	}
 }
