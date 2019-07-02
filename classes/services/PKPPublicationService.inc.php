@@ -289,13 +289,13 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 		$newPublication->setData('lastModified', Core::getCurrentDate());
 		$newPublication = $this->add($newPublication, $request);
 
-		$contributors = $publication->getData('contributors');
-		if (!empty($contributors)) {
-			foreach ($contributors as $contributor) {
-				$newContributor = clone $contributor;
-				$newContributor->setData('id', null);
-				$newContributor->setData('publicationId', $newPublication->getId());
-				Services::get('author')->add($newContributor, $request);
+		$authors = $publication->getData('authors');
+		if (!empty($authors)) {
+			foreach ($authors as $author) {
+				$newAuthor = clone $author;
+				$newAuthor->setData('id', null);
+				$newAuthor->setData('publicationId', $newPublication->getId());
+				Services::get('author')->add($newAuthor, $request);
 			}
 		}
 
