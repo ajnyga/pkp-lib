@@ -484,20 +484,7 @@ abstract class PKPSubmission extends DataObject {
 	 * @deprecated 3.2.0.0
 	 */
 	function setTitle($title, $locale) {
-		$this->setCleanTitle($title, $locale);
 		$this->setData('title', $title, $locale);
-	}
-
-	/**
-	 * Set 'clean' title (with punctuation removed).
-	 * @param $cleanTitle string
-	 * @param $locale
-	 * @deprecated 3.2.0.0
-	 */
-	function setCleanTitle($cleanTitle, $locale) {
-		$punctuation = array ('"', '\'', ',', '.', '!', '?', '-', '$', '(', ')');
-		$cleanTitle = str_replace($punctuation, '', $cleanTitle);
-		$this->setData('cleanTitle', $cleanTitle, $locale);
 	}
 
 	/**

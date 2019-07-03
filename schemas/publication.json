@@ -50,15 +50,6 @@
 				"nullable"
 			]
     },
-		"cleanTitle": {
-			"type": "string",
-			"description": "A sanitized form of the title with the punctuation removed.",
-      "multilingual": true,
-      "readOnly": true,
-			"validation": [
-				"nullable"
-			]
-    },
 		"copyrightHolder": {
 			"type": "string",
 			"description": "The copyright statement for this publication.",
