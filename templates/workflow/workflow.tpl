@@ -35,7 +35,7 @@
 				</span>
 				<span class="pkpWorkflow__identificationDivider">/</span>
 				<span class="pkpWorkflow__identificationTitle">
-					{{ localizeSubmission(currentPublication.title, currentPublication.locale) }}
+					{{ localizeSubmission(currentPublication.fullTitle, currentPublication.locale) }}
 				</span>
 			</h1>
 			<template slot="actions">

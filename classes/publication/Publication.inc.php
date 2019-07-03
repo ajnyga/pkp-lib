@@ -81,7 +81,7 @@ class Publication extends DataObject {
       if (!$title) {
         continue;
       }
-      $return[] = $this->getLocalizedFullTitle($locale);
+      $return[$locale] = $this->getLocalizedFullTitle($locale);
     }
     return $return;
   }
