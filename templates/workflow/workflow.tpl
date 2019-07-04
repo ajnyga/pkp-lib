@@ -44,6 +44,16 @@
 					:label="isPublished ? i18n.view : i18n.preview"
 					:href="submission.urlPublished"
 				></pkp-button>
+				<pkp-button
+					label="{translate key="editor.activityLog"}"
+					ref="activityButton"
+					@click="openActivity"
+				></pkp-button>
+				<pkp-button
+					label="{translate key="editor.submissionLibrary"}"
+					ref="library"
+					@click="openLibrary"
+				></pkp-button>
 			</template>
 		</pkp-header>
 		<tabs default-tab="workflow">
@@ -65,14 +75,6 @@
 					{load_url_in_div id="submissionProgressBarDiv" url=$submissionProgressBarUrl}
 
 				</div>
-			</tab>
-			<tab id="editorialHistory" label="{translate key="editor.activity"}">
-				{capture assign=informationCenterUrl}{url router=$smarty.const.ROUTE_COMPONENT component="informationCenter.SubmissionInformationCenterHandler" op="viewInformationCenter" submissionId=$submission->getId() escape=false}{/capture}
-				{load_url_in_div id="informationCenterDiv" url=$informationCenterUrl}
-			</tab>
-			<tab id="submissionLibrary" label="{translate key="editor.submissionLibrary"}">
-				{capture assign=submissionLibraryUrl}{url router=$smarty.const.ROUTE_COMPONENT component="modals.documentLibrary.DocumentLibraryHandler" op="documentLibrary" submissionId=$submission->getId() escape=false}{/capture}
-				{load_url_in_div id="submissionLibraryDiv" url=$submissionLibraryUrl}
 			</tab>
 			<tab id="publication" label="{translate key="submission.issueEntry.publicationMetadata"}">
 				<div class="pkpPublication" ref="publication" aria-live="polite">

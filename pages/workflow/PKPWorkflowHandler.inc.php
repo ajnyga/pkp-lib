@@ -456,6 +456,26 @@ abstract class PKPWorkflowHandler extends Handler {
 			]
 		);
 
+		$editorialHistoryUrl = $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'informationCenter.SubmissionInformationCenterHandler',
+			'viewInformationCenter',
+			null,
+			array('submissionId' => $submission->getId())
+		);
+
+		$submissionLibraryUrl = $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'modals.documentLibrary.DocumentLibraryHandler',
+			'documentLibrary',
+			null,
+			array('submissionId' => $submission->getId())
+		);
+
 		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
 		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
 		$issueEntryForm = new APP\components\forms\publication\IssueEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
@@ -482,6 +502,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			],
 			'contributorsGridUrl' => $contributorsGridUrl,
 			'csrfToken' => $request->getSession()->getCSRFToken(),
+			'editorialHistoryUrl' => $editorialHistoryUrl,
 			'publicationFormIds' => [
 				FORM_TITLE_ABSTRACT,
 				FORM_PUBLICATION_LICENSE,
@@ -490,12 +511,15 @@ abstract class PKPWorkflowHandler extends Handler {
 			'representationsGridUrl' => $this->_getRepresentationsGridUrl($request, $submission),
 			'submission' => $submissionProps,
 			'submissionApiUrl' => $submissionApiUrl,
+			'submissionLibraryUrl' => $submissionLibraryUrl,
 			'supportsReferences' => !!$submissionContext->getData('citations'),
 			'i18n' => [
+				'activityLog' => __('submission.list.infoCenter'),
 				'preview' => __('common.preview'),
 				'publish' => __('publication.publish'),
 				'schedulePublication' => __('editor.article.schedulePublication'),
 				'status' => __('semicolon', ['label' => __('common.status')]),
+				'submissionLibrary' => __('grid.libraryFiles.submission.title'),
 				'view' => __('common.view'),
 				'version' => __('semicolon', ['label' => __('admin.version')]),
 			],
