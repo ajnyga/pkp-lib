@@ -44,8 +44,8 @@
 				></pkp-button>
 			</template>
 		</pkp-header>
-		<tabs :options="{ useUrlFragment: false }">
-			<tab id="workflow" name="{translate key="manager.workflow"}">
+		<tabs>
+			<tab id="workflow" label="{translate key="manager.workflow"}">
 
 				{include file="controllers/notification/inPlaceNotification.tpl" notificationId="authorDashboardNotification" requestOptions=$authorDashboardNotificationRequestOptions}
 
@@ -85,11 +85,11 @@
 					</ul>
 				</div>
 			</tab>
-			<tab id="submissionLibrary" name="{translate key="editor.submissionLibrary"}">
+			<tab id="submissionLibrary" label="{translate key="editor.submissionLibrary"}">
 				{capture assign=submissionLibraryUrl}{url router=$smarty.const.ROUTE_COMPONENT component="modals.documentLibrary.DocumentLibraryHandler" op="documentLibrary" submissionId=$submission->getId() escape=false}{/capture}
 				{load_url_in_div id="submissionLibraryDiv" url=$submissionLibraryUrl}
 			</tab>
-			<tab id="publication" name="{translate key="submission.issueEntry.publicationMetadata"}">
+			<tab id="publication" label="{translate key="submission.issueEntry.publicationMetadata"}">
 				<div class="pkpPublication" ref="publication" aria-live="polite">
 					<pkp-header class="pkpPublication__header">
 						<span v-if="submission.publications.length > 1" class="pkpPublication__version">
@@ -136,30 +136,30 @@
 					>
 						{translate key="publication.editDisabled"}
 					</div>
-					<tabs :options="{ useUrlFragment: false }" class="pkpPublication__tabs tabs-component--side">
-						<tab name="{translate key="publication.titleAbstract"}">
+					<tabs :is-side-tabs="true" class="pkpPublication__tabs">
+						<tab id="titleAbstract" label="{translate key="publication.titleAbstract"}">
 							.
 						</tab>
-						<tab name="{translate key="publication.contributors"}">
+						<tab id="contributors" label="{translate key="publication.contributors"}">
 							<div id="contributors-grid" ref="contributors">
 								<spinner></spinner>
 							</div>
 						</tab>
-						<tab name="{translate key="submission.informationCenter.metadata"}">
+						<tab id="metadata" label="{translate key="submission.informationCenter.metadata"}">
 							.
 						</tab>
-						<tab v-if="supportsReferences" name="{translate key="submission.citations"}">
+						<tab v-if="supportsReferences" id="citations" label="{translate key="submission.citations"}">
 							.
 						</tab>
-						<tab name="{translate key="submission.identifiers"}">
+						<tab id="identifiers" label="{translate key="submission.identifiers"}">
 							.
 						</tab>
-						<tab name="{translate key="submission.layout.galleys"}">
+						<tab id="galleys" label="{translate key="submission.layout.galleys"}">
 							<div id="representations-grid" ref="representations">
 								<spinner></spinner>
 							</div>
 						</tab>
-						<tab name="{translate key="publication.publicationLicense"}">
+						<tab id="license" label="{translate key="publication.publicationLicense"}">
 							.
 						</tab>
 						{call_hook name="Template::Workflow::Publication"}
