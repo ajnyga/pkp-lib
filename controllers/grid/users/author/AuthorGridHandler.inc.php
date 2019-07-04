@@ -351,10 +351,12 @@ class AuthorGridHandler extends GridHandler {
 			if($author->getPrimaryContact()) {
 				// If this is the primary contact, redraw the whole grid
 				// so that it takes the checkbox off other rows.
-				return DAO::getDataChangedEvent();
+				$json = DAO::getDataChangedEvent();
 			} else {
-				return DAO::getDataChangedEvent($authorId);
+				$json = DAO::getDataChangedEvent($authorId);
 			}
+			$json->setGlobalEvent('authorsUpdated');
+			return $json;
 		} else {
 			return new JSONMessage(true, $authorForm->fetch($request));
 		}
@@ -373,7 +375,9 @@ class AuthorGridHandler extends GridHandler {
 
 		$authorDao = DAORegistry::getDAO('AuthorDAO');
 		$authorDao->deleteById($authorId);
-		return DAO::getDataChangedEvent($authorId);
+		$json = DAO::getDataChangedEvent($authorId);
+		$json->setGlobalEvent('authorsUpdated');
+		return $json;
 	}
 
 	/**
