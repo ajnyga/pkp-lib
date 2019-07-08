@@ -516,6 +516,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			'i18n' => [
 				'activityLog' => __('submission.list.infoCenter'),
 				'preview' => __('common.preview'),
+				'publicationTabsLabel' => __('publication.version.details'),
 				'publish' => __('publication.publish'),
 				'schedulePublication' => __('editor.article.schedulePublication'),
 				'status' => __('semicolon', ['label' => __('common.status')]),

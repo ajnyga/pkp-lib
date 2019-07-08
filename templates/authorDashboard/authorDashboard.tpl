@@ -137,7 +137,7 @@
 					>
 						{translate key="publication.editDisabled"}
 					</div>
-					<tabs :is-side-tabs="true" class="pkpPublication__tabs">
+					<tabs :is-side-tabs="true" class="pkpPublication__tabs" :label="publicationTabsLabel">
 						<tab id="titleAbstract" label="{translate key="publication.titleAbstract"}">
 							.
 						</tab>

@@ -134,7 +134,7 @@
 					>
 						{translate key="publication.editDisabled"}
 					</div>
-					<tabs class="pkpPublication__tabs" :is-side-tabs="true">
+					<tabs class="pkpPublication__tabs" :is-side-tabs="true" :label="publicationTabsLabel">
 						<tab id="titleAbstract" label="{translate key="publication.titleAbstract"}">
 							<pkp-form v-bind="components.{$smarty.const.FORM_TITLE_ABSTRACT}" @set="set" />
 						</tab>

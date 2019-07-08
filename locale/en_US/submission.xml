@@ -678,5 +678,6 @@
 	<message key="publication.titleAbstract">Title &amp; Abstract</message>
 	<message key="publication.titleAbstract.success">The title and abstract have been updated.</message>
 	<message key="publication.version.all">All Versions</message>
+	<message key="publication.version.details">Publication details for version {$version}</message>
 	<message key="publication.wordCountLong">The abstract is too long. It shoud be {$limit} words or less. It is currently {$count} words long.</message>
 </locale>

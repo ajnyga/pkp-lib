@@ -157,6 +157,7 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 			'supportsReferences' => !!$submissionContext->getData('citations'),
 			'uploadFileUrl' => $uploadFileUrl,
 			'i18n' => [
+				'publicationTabsLabel' => __('publication.version.details'),
 				'status' => __('semicolon', ['label' => __('common.status')]),
 				'submissionLibrary' => __('grid.libraryFiles.submission.title'),
 				'uploadFile' => __('common.upload.addFile'),
