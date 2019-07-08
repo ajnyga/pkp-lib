@@ -123,6 +123,16 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 			]
 		);
 
+		$submissionLibraryUrl = $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'modals.documentLibrary.DocumentLibraryHandler',
+			'documentLibrary',
+			null,
+			array('submissionId' => $submission->getId())
+		);
+
 		$submissionProps = Services::get('submission')->getFullProperties(
 			$submission,
 			[
@@ -143,10 +153,12 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 			'representationsGridUrl' => $this->_getRepresentationsGridUrl($request, $submission),
 			'submission' => $submissionProps,
 			'submissionApiUrl' => $submissionApiUrl,
+			'submissionLibraryUrl' => $submissionLibraryUrl,
 			'supportsReferences' => !!$submissionContext->getData('citations'),
 			'uploadFileUrl' => $uploadFileUrl,
 			'i18n' => [
 				'status' => __('semicolon', ['label' => __('common.status')]),
+				'submissionLibrary' => __('grid.libraryFiles.submission.title'),
 				'uploadFile' => __('common.upload.addFile'),
 				'view' => __('common.view'),
 				'version' => __('semicolon', ['label' => __('admin.version')]),
@@ -210,6 +222,7 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 		AppLocale::requireComponents(
 			LOCALE_COMPONENT_PKP_SUBMISSION,
 			LOCALE_COMPONENT_APP_SUBMISSION,
+			LOCALE_COMPONENT_PKP_EDITOR,
 			LOCALE_COMPONENT_APP_EDITOR,
 			LOCALE_COMPONENT_PKP_GRID
 		);

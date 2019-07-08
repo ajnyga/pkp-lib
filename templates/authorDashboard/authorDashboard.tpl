@@ -37,10 +37,15 @@
 					{{ localizeSubmission(currentPublication.title, currentPublication.locale) }}
 				</span>
 			</h1>
-			<template v-if="uploadFileUrl" slot="actions">
+			<template slot="actions">
 				<pkp-button
+					v-if="uploadFileUrl"
 					:label="i18n.uploadFile"
 					@click="openFileUpload"
+				></pkp-button>
+				<pkp-button
+					label="{translate key="editor.submissionLibrary"}"
+					@click="openLibrary"
 				></pkp-button>
 			</template>
 		</pkp-header>
@@ -84,10 +89,6 @@
 						{/foreach}
 					</ul>
 				</div>
-			</tab>
-			<tab id="submissionLibrary" label="{translate key="editor.submissionLibrary"}">
-				{capture assign=submissionLibraryUrl}{url router=$smarty.const.ROUTE_COMPONENT component="modals.documentLibrary.DocumentLibraryHandler" op="documentLibrary" submissionId=$submission->getId() escape=false}{/capture}
-				{load_url_in_div id="submissionLibraryDiv" url=$submissionLibraryUrl}
 			</tab>
 			<tab id="publication" label="{translate key="submission.issueEntry.publicationMetadata"}">
 				<div class="pkpPublication" ref="publication" aria-live="polite">
