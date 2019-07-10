@@ -404,28 +404,6 @@ abstract class PKPWorkflowHandler extends Handler {
 		$templateMgr->assign('submissionStageId', $submission->getStageId());
 		$templateMgr->assign('workflowStages', $workflowStages);
 
-		if (isset($accessibleWorkflowStages[$stageId]) && array_intersect(array(ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT), $accessibleWorkflowStages[$stageId])) {
-			import('controllers.modals.submissionMetadata.linkAction.SubmissionEntryLinkAction');
-			$templateMgr->assign(
-				'submissionEntryAction',
-				new SubmissionEntryLinkAction($request, $submission->getId(), $stageId)
-			);
-		}
-
-		if (isset($accessibleWorkflowStages[$stageId]) && array_intersect(array(ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR), $accessibleWorkflowStages[$stageId])) {
-			import('lib.pkp.controllers.informationCenter.linkAction.SubmissionInfoCenterLinkAction');
-			$templateMgr->assign(
-				'submissionInformationCenterAction',
-				new SubmissionInfoCenterLinkAction($request, $submission->getId())
-			);
-		}
-
-		import('lib.pkp.controllers.modals.documentLibrary.linkAction.SubmissionLibraryLinkAction');
-		$templateMgr->assign(
-			'submissionLibraryAction',
-			new SubmissionLibraryLinkAction($request, $submission->getId())
-		);
-
 		// Publication tab
 		$supportedFormLocales = $submissionContext->getSupportedFormLocales();
 		$localeNames = AppLocale::getAllLocales();

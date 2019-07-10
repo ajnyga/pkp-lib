@@ -18,8 +18,6 @@ import('lib.pkp.classes.controllers.grid.GridHandler');
 import('lib.pkp.controllers.grid.users.author.PKPAuthorGridCellProvider');
 import('lib.pkp.controllers.grid.users.author.AuthorGridRow');
 
-import('lib.pkp.classes.controllers.modals.submissionMetadata.SubmissionMetadataHandler');
-
 // Link action & modal classes
 import('lib.pkp.classes.linkAction.request.AjaxModal');
 
@@ -256,7 +254,7 @@ class AuthorGridHandler extends GridHandler {
 		if ($submission->getDateSubmitted() == null) return true;
 
 		// The user may not be allowed to edit the metadata
-		if (SubmissionMetadataHandler::getUserAllowEditMetadata($submission->getId(), $user->getId(), null)) {
+		if (Services::get('submission')->canUserEditMetadata($submission->getId(), $user->getId())) {
 			return true;
 		}
 

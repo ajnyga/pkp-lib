@@ -111,4 +111,19 @@ class PKPPublicationQueryBuilder extends BaseQueryBuilder {
 
 		return $q;
 	}
+
+	/**
+	 * Get the oldest and most recent publication dates for publications
+	 *
+	 * @return object Query object
+	 */
+	public function getDateBoundaries() {
+		$q = $this->get();
+		$q->select([
+			'MIN(p.date_published)',
+			'MAX(p.date_published)'
+		]);
+
+		return $q;
+	}
 }

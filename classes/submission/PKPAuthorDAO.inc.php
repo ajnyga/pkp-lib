@@ -89,73 +89,12 @@ abstract class PKPAuthorDAO extends SchemaDAO {
 	}
 
 	/**
-	 * Retrieve the number of authors assigned to a submission
-	 * @param $submissionId int Submission ID.
-	 * @return int
-	 */
-	function getAuthorCountBySubmissionId($submissionId, $submissionVersion = null) {
-		$params = array((int) $submissionId);
-
-		if ($submissionVersion) {
-			$params[] = (int) $submissionVersion;
-		}
-
-		$result = $this->retrieve(
-			'SELECT COUNT(*) FROM authors WHERE submission_id = ?'
-			. ($submissionVersion ? ' AND submission_version = ? ' : ' AND is_current_submission_version = 1'),
-			$params
-		);
-
-		$returner = $result->fields[0];
-
-		$result->Close();
-		return $returner;
-	}
-
-	/**
-	 * Sequentially renumber a submission's authors in their sequence order.
-	 * @param $submissionId int Submission ID.
-	 */
-	function resequenceAuthors($submissionId, $submissionVersion = null) {
-		$params = array((int) $submissionId);
-
-		if ($submissionVersion) {
-			$params[] = (int) $submissionVersion;
-		}
-
-		$result = $this->retrieve(
-			'SELECT author_id FROM authors WHERE submission_id = ?'
-			. ($submissionVersion ? ' AND submission_version = ? ' : ' AND is_current_submission_version = 1')
-			.' ORDER BY seq',
-			$params
-		);
-
-		for ($i=1; !$result->EOF; $i++) {
-			list($authorId) = $result->fields;
-			$this->update(
-				'UPDATE authors SET seq = ? WHERE author_id = ?',
-				array(
-					$i,
-					$authorId
-				)
-			);
-
-			$result->MoveNext();
-		}
-		$result->Close();
-	}
-
-	/**
 	 * Retrieve the primary author for a submission.
 	 * @param $submissionId int Submission ID.
 	 * @return Author
 	 */
-	function getPrimaryContact($submissionId, $submissionVersion = null) {
+	function getPrimaryContact($submissionId) {
 		$params = array((int) $submissionId);
-
-		if ($submissionVersion) {
-			$params[] = (int) $submissionVersion;
-		}
 
 		$result = $this->retrieve(
 			'SELECT a.*, ug.show_title, s.locale
@@ -163,7 +102,6 @@ abstract class PKPAuthorDAO extends SchemaDAO {
 				JOIN user_groups ug ON (a.user_group_id=ug.user_group_id)
 				JOIN submissions s ON (s.submission_id = a.submission_id)
 			WHERE a.submission_id = ?'
-			. ($submissionVersion ? ' AND a.submission_version = ? ' : ' AND a.is_current_submission_version = 1')
 			. ' AND a.primary_contact = 1',
 			$params
 		);
@@ -174,33 +112,6 @@ abstract class PKPAuthorDAO extends SchemaDAO {
 		}
 		$result->Close();
 		return $returner;
-	}
-
-	/**
-	 * Remove other primary contacts from a submission and set to authorId
-	 * @param $authorId int Author ID.
-	 * @param $submissionId int Submission ID.
-	 */
-	function resetPrimaryContact($authorId, $submissionId, $submissionVersion = null) {
-		$params = array((int) $submissionId);
-		if ($submissionVersion) {
-			$params[] = (int) $submissionVersion;
-		}
-
-		$this->update(
-			'UPDATE authors SET primary_contact = 0
-			WHERE primary_contact = 1
-			AND submission_id = ?'
-			. ($submissionVersion ? ' AND submission_version = ? ' : ' AND is_current_submission_version = 1'),
-			$params
-		);
-
-		$params = array((int) $authorId, (int) $submissionId);
-
-		$this->update(
-			'UPDATE authors SET primary_contact = 1 WHERE author_id = ? AND submission_id = ?',
-			$params
-		);
 	}
 
 	/**
@@ -242,8 +153,8 @@ abstract class PKPAuthorDAO extends SchemaDAO {
 	 * Delete authors by submission.
 	 * @param $submissionId int
 	 */
-	function deleteBySubmissionId($submissionId, $submissionVersion = null) {
-		$authors = $this->getBySubmissionId($submissionId, false, false, $submissionVersion);
+	function deleteBySubmissionId($submissionId) {
+		$authors = $this->getBySubmissionId($submissionId, false, false);
 		foreach ($authors as $author) {
 			$this->deleteObject($author);
 		}

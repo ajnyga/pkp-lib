@@ -106,22 +106,12 @@ class NativeXmlSubmissionFilter extends NativeImportFilter {
 		} else {
 			$submission->setDateSubmitted(time());
 		}
+		if ($datePublished = $node->getAttribute('date_published')) {
+			$submission->setDatePublished($datePublished);
+			$submission->setStatus(STATUS_PUBLISHED);
+		}
 		$submissionDao->updateObject($submission);
 
-		// If the date_published was set, add a published submission
-		if ($datePublished = $node->getAttribute('date_published')) {
-			$publishedSubmissionDao = $this->getPublishedSubmissionDAO();
-			$publishedSubmission = $publishedSubmissionDao->newDataObject();
-			$publishedSubmission->setId($submission->getId());
-			$publishedSubmission->setDatePublished(strtotime($datePublished));
-			$publishedSubmission = $this->populatePublishedSubmission($publishedSubmission, $node);
-			$publishedSubmissionDao->insertObject($publishedSubmission);
-
-			// Reload from DB now that some fields may have changed
-			$submission = $submissionDao->getById($submission->getId());
-			$submission->setStatus(STATUS_PUBLISHED);
-			$submissionDao->updateObject($submission);
-		}
 		return $submission;
 	}
 
@@ -285,14 +275,6 @@ class NativeXmlSubmissionFilter extends NativeImportFilter {
 	}
 
 	/**
-	 * Get the published submission DAO for this application.
-	 * @return DAO
-	 */
-	function getPublishedSubmissionDAO() {
-		assert(false); // Subclasses must override
-	}
-
-	/**
 	 * Get the representation export filter group name
 	 * @return string
 	 */
@@ -311,9 +293,9 @@ class NativeXmlSubmissionFilter extends NativeImportFilter {
 
 	/**
 	 * Class-specific methods for published submissions.
-	 * @param PublishedSubmission $submission
+	 * @param Submission $submission
 	 * @param DOMElement $node
-	 * @return PublishedSubmission
+	 * @return Submission
 	 */
 	function populatePublishedSubmission($submission, $node) {
 		assert(false); // Subclasses should override.

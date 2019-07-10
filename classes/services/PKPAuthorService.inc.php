@@ -39,6 +39,9 @@ class PKPAuthorService implements EntityReadInterface, EntityWriteInterface, Ent
 	 * Get authors
 	 *
 	 * @param array $args {
+	 * 		@option int|array contextIds
+	 * 		@option string familyName
+	 * 		@option string givenName
 	 * 		@option int|array publicationIds
 	 * 		@option int count
 	 * 		@option int offset
@@ -79,14 +82,21 @@ class PKPAuthorService implements EntityReadInterface, EntityWriteInterface, Ent
 	private function _getQueryBuilder($args = []) {
 
 		$defaultArgs = [
+			'contextIds' => [],
+			'familyName' => '',
+			'givenName' => '',
 			'publicationIds' => null,
 		];
 
 		$args = array_merge($defaultArgs, $args);
 
 		$authorQB = new PKPAuthorQueryBuilder();
+		$authorQB->filterByName($args['givenName'], $args['familyName']);
 		if (!empty($args['publicationIds'])) {
 			$authorQB->filterByPublicationIds($args['publicationIds']);
+		}
+		if (!empty($args['contextIds'])) {
+			$authorQB->filterByContextIds($args['contextIds']);
 		}
 
 		\HookRegistry::call('Author::getMany::queryBuilder', array($authorQB, $args));

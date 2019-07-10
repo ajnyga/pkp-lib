@@ -72,11 +72,6 @@ class ReviewerReviewStep1Form extends ReviewerReviewForm {
 		import('lib.pkp.classes.linkAction.request.AjaxModal');
 		import('lib.pkp.classes.linkAction.request.ConfirmationModal');
 
-		// "View metadata" action.
-		import('lib.pkp.controllers.modals.submissionMetadata.linkAction.ReviewerViewMetadataLinkAction');
-		$viewMetadataLinkAction = new ReviewerViewMetadataLinkAction($request, $reviewAssignment->getSubmissionId(), $reviewAssignment->getId());
-		$templateMgr->assign('viewMetadataAction', $viewMetadataLinkAction);
-
 		// include the confirmation modal for competing interests if the context has them.
 		if ($context->getLocalizedData('competingInterests') != '') {
 			import('lib.pkp.controllers.confirmationModal.linkAction.ViewCompetingInterestGuidelinesLinkAction');

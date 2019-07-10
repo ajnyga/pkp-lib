@@ -784,4 +784,21 @@ abstract class PKPSubmissionService implements EntityPropertyInterface, EntityRe
 
 		\HookRegistry::call('Submission::delete', [$submission]);
 	}
+
+	/**
+	 * Check if a user can edit a submission's metadata
+	 *
+	 * @param int $submissionId
+	 * @param int $userId
+	 * @return boolean
+	 */
+	public function canUserEditMetadata($submissionId, $userId) {
+		$stageAssignments = DAORegistry::getDAO('StageAssignmentDAO')->getBySubmissionAndUserIdAndStageId($submissionId, $userId, null)->toArray();
+		foreach($stageAssignments as $stageAssignment) {
+			if ($stageAssignment->getCanChangeMetadata()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

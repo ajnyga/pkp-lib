@@ -99,24 +99,6 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	}
 
 	/**
-	 * Get the latest revision id for a submission
-	 * @param $submissionId int
-	 * @param $contextId int
-	 * @return int
-	 */
-	function getCurrentSubmissionVersionById($submissionId) {
-		if (!$submissionId)
-			return null;
-
-		$submission = $this->getById($submissionId);
-
-		if ($submission)
-			return $submission->getCurrentSubmissionVersion();
-
-		return null;
-	}
-
-	/**
 	 * Delete a submission.
 	 * @param $submission Submission
 	 */
@@ -246,7 +228,7 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	 */
 	function changePubId($pubObjectId, $pubIdType, $pubId) {
 		$idFields = array(
-			'submission_id', 'submission_version', 'locale', 'setting_name'
+			'submission_id', 'locale', 'setting_name'
 		);
 		$updateArray = array(
 			'submission_id' => (int) $pubObjectId,
@@ -294,6 +276,45 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	}
 
 	/**
+	 * Retrieve submission by public id
+	 * @param $pubIdType string One of the NLM pub-id-type values or
+	 * 'other::something' if not part of the official NLM list
+	 * (see <http://dtd.nlm.nih.gov/publishing/tag-library/n-4zh0.html>).
+	 * @param $pubId string
+	 * @param $contextId int
+	 * @return Submission|null
+	 */
+	function getByPubId($pubIdType, $pubId, $contextId = null) {
+
+		$params = [
+			'pub-id::' . $pubIdType,
+			$pubId,
+		];
+		if ($contextId) {
+			$params[] = $contextId;
+		}
+
+		$result = $this->retrieve(
+			'SELECT ss.submission_id
+				FROM publication_settings ps
+				INNER JOIN publications p ON p.publication_id = ps.publication_id
+				INNER JOIN submissions s ON p.submission_id = s.submission_id
+				WHERE ps.setting_name = ? AND ps.setting_value = ?'
+				. $contextId ? ' AND s.context_id = ?' : '',
+			$params
+		);
+
+		$submissionId = $result->fields[0];
+
+		if ($submissionId) {
+			return null;
+		}
+
+		return $this->getById($submissionId);
+	}
+
+
+	/**
 	 * Get the ID of the last inserted submission.
 	 * @return int
 	 */
@@ -305,8 +326,6 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	 * Flush the submission cache.
 	 */
 	function flushCache() {
-		// Because both published_submissions and submissions are
-		// cached by submission ID, flush both caches on update.
 		$cache = $this->_getCache();
 		$cache->flush();
 	}
@@ -343,10 +362,18 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	function resetPermissions($contextId) {
 		$submissions = $this->getByContextId($contextId);
 		while ($submission = $submissions->next()) {
-			$submission->setCopyrightYear($submission->_getContextLicenseFieldValue(null, PERMISSIONS_FIELD_COPYRIGHT_YEAR));
-			$submission->setCopyrightHolder($submission->_getContextLicenseFieldValue(null, PERMISSIONS_FIELD_COPYRIGHT_HOLDER), null);
-			$submission->setLicenseURL($submission->_getContextLicenseFieldValue(null, PERMISSIONS_FIELD_LICENSE_URL));
-			$this->updateObject($submission);
+			$publications = (array) $submission->getData('publications');
+			if (empty($publications)) {
+				continue;
+			}
+			$params = [
+				'copyrightYear' => $submission->_getContextLicenseFieldValue(null, PERMISSIONS_FIELD_COPYRIGHT_YEAR),
+				'copyrightHolder' => $submission->_getContextLicenseFieldValue(null, PERMISSIONS_FIELD_COPYRIGHT_HOLDER),
+				'licenseUrl' => $submission->_getContextLicenseFieldValue(null, PERMISSIONS_FIELD_LICENSE_URL),
+			];
+			foreach ($publications as $publication) {
+				$publication = Services::get('publication')->edit($publication, $params, Application::get()->getRequest());
+			}
 		}
 		$this->flushCache();
 	}

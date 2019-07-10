@@ -56,7 +56,7 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 */
 	function getRevision($fileId, $revision, $fileStage = null, $submissionId = null) {
 		if (!($fileId && $revision)) return null;
-		$revisions = $this->_getInternally($submissionId, $fileStage, $fileId, $revision, null, null, null, null, null, false, null, $submissionVersion);
+		$revisions = $this->_getInternally($submissionId, $fileStage, $fileId, $revision, null, null, null, null, null, false, null);
 		return $this->_checkAndReturnRevision($revisions);
 	}
 
@@ -68,13 +68,12 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $contextId int optional
 	 * @return array The file IDs identified by setting.
 	 */
-	function getFileIdsBySetting($settingName, $settingValue, $submissionId = null, $contextId = null, $submissionVersion = null) {
+	function getFileIdsBySetting($settingName, $settingValue, $submissionId = null, $contextId = null) {
 		$params = array($settingName);
 
 		$sql = 'SELECT DISTINCT	f.file_id
 			FROM	submission_files f
-				INNER JOIN submissions s ON s.submission_id = f.submission_id
-				LEFT JOIN published_submissions ps ON f.submission_id = ps.submission_id and (ps.published_submission_version = s.submission_version) and ps.is_current_submission_version = 1';
+				INNER JOIN submissions s ON s.submission_id = f.submission_id';
 		if (is_null($settingValue)) {
 			$sql .= 'LEFT JOIN submission_file_settings fs ON f.file_id = fs.file_id AND fs.setting_name = ?
 				WHERE	(fs.setting_value IS NULL OR fs.setting_value = \'\')';
@@ -92,11 +91,6 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 		if ($contextId) {
 			$params[] = (int) $contextId;
 			$sql .= ' AND s.context_id = ?';
-		}
-
-		if ($submissionVersion) {
-			$params[] = (int) $submissionVersion;
-			$sql .= ($submissionVersion ? ' AND f.submission_version = ? ' : '');
 		}
 
 		$sql .= ' ORDER BY f.file_id';
@@ -123,10 +117,10 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $contextId int optional
 	 * @return SubmissionFile|null
 	 */
-	function getByPubId($pubIdType, $pubId, $submissionId = null, $contextId = null, $submissionVersion = null) {
+	function getByPubId($pubIdType, $pubId, $submissionId = null, $contextId = null) {
 		$file = null;
 		if (!empty($pubId)) {
-			$fileIds = $this->getFileIdsBySetting('pub-id::'.$pubIdType, $pubId, $submissionId, $contextId, $submissionVersion);
+			$fileIds = $this->getFileIdsBySetting('pub-id::'.$pubIdType, $pubId, $submissionId, $contextId);
 			if (!empty($fileIds)) {
 				assert(count($fileIds) == 1);
 				$fileId = $fileIds[0];
@@ -143,14 +137,14 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $submissionId int
 	 * @return SubmissionFile|null
 	 */
-	function getByBestId($fileId, $submissionId, $submissionVersion = null) {
+	function getByBestId($fileId, $submissionId) {
 		$file = null;
-		if ($fileId != '') $file = $this->getByPubId('publisher-id', $fileId, $submissionId, null, $submissionVersion);
+		if ($fileId != '') $file = $this->getByPubId('publisher-id', $fileId, $submissionId, null);
 		if (!isset($file)) {
 			list($fileId, $revision) = array_map(function($a) {
 				return (int) $a;
 			}, preg_split('/-/', $fileId));
-			$file = $this->getRevision($fileId, $revision, null, $submissionId, $submissionVersion);
+			$file = $this->getRevision($fileId, $revision, null, $submissionId);
 		}
 		if ($file && $file->getFileStage() == SUBMISSION_FILE_PROOF) return $file;
 		if ($file && $file->getFileStage() == SUBMISSION_FILE_DEPENDENT) return $file;
@@ -180,9 +174,9 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $rangeInfo DBResultRange (optional)
 	 * @return array|null a list of SubmissionFile instances
 	 */
-	function getLatestRevisions($submissionId, $fileStage = null, $rangeInfo = null, $submissionVersion = null) {
+	function getLatestRevisions($submissionId, $fileStage = null, $rangeInfo = null) {
 		if (!$submissionId) return null;
-		return $this->_getInternally($submissionId, $fileStage, null, null, null, null, null, null, null, true, $rangeInfo, $submissionVersion);
+		return $this->_getInternally($submissionId, $fileStage, null, null, null, null, null, null, null, true, $rangeInfo);
 	}
 
 	/**
@@ -195,9 +189,9 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $rangeInfo DBResultRange (optional)
 	 * @return array|null a list of SubmissionFile instances
 	 */
-	function getAllRevisions($fileId, $fileStage = null, $submissionId = null, $rangeInfo = null, $submissionVersion = null) {
+	function getAllRevisions($fileId, $fileStage = null, $submissionId = null, $rangeInfo = null) {
 		if (!$fileId) return null;
-		return $this->_getInternally($submissionId, $fileStage, $fileId, null, null, null, null, null, null, false, $rangeInfo, $submissionVersion);
+		return $this->_getInternally($submissionId, $fileStage, $fileId, null, null, null, null, null, null, false, $rangeInfo);
 	}
 
 	/**
@@ -206,9 +200,9 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $rangeInfo DBResultRange (optional)
 	 * @return array a list of SubmissionFile instances
 	 */
-	function getBySubmissionId($submissionId, $rangeInfo = null, $submissionVersion = null) {
+	function getBySubmissionId($submissionId, $rangeInfo = null) {
 		if (!$submissionId) return null;
-		return $this->_getInternally($submissionId, null, null, null, null, null, null, null, null, false, $rangeInfo, $submissionVersion);
+		return $this->_getInternally($submissionId, null, null, null, null, null, null, null, null, false, $rangeInfo);
 	}
 
 	/**
@@ -221,9 +215,9 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $rangeInfo DBResultRange (optional)
 	 * @return array|null a list of SubmissionFile instances
 	 */
-	function getLatestRevisionsByAssocId($assocType, $assocId, $submissionId = null, $fileStage = null, $rangeInfo = null, $submissionVersion = null) {
+	function getLatestRevisionsByAssocId($assocType, $assocId, $submissionId = null, $fileStage = null, $rangeInfo = null) {
 		if (!($assocType && $assocId)) return null;
-		return $this->_getInternally($submissionId, $fileStage, null, null, $assocType, $assocId, null, null, null, true, $rangeInfo, $submissionVersion);
+		return $this->_getInternally($submissionId, $fileStage, null, null, $assocType, $assocId, null, null, null, true, $rangeInfo);
 	}
 
 	/**
@@ -235,9 +229,9 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 * @param $rangeInfo DBResultRange (optional)
 	 * @return array|null a list of SubmissionFile instances
 	 */
-	function getAllRevisionsByAssocId($assocType, $assocId, $fileStage = null, $rangeInfo = null, $submissionVersion = null) {
+	function getAllRevisionsByAssocId($assocType, $assocId, $fileStage = null, $rangeInfo = null) {
 		if (!($assocType && $assocId)) return null;
-		return $this->_getInternally(null, $fileStage, null, null, $assocType, $assocId, null, null, null, false, $rangeInfo, $submissionVersion);
+		return $this->_getInternally(null, $fileStage, null, null, $assocType, $assocId, null, null, null, false, $rangeInfo);
 	}
 
 	/**
@@ -419,7 +413,7 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 *  must belong to.
 	 * @return SubmissionFile the new revision or null if something went wrong.
 	 */
-	function setAsLatestRevision($revisedFileId, $newFileId, $submissionId, $fileStage, $submissionVersion = null) {
+	function setAsLatestRevision($revisedFileId, $newFileId, $submissionId, $fileStage) {
 		$revisedFileId = (int)$revisedFileId;
 		$newFileId = (int)$newFileId;
 		$submissionId = (int)$submissionId;
@@ -429,8 +423,8 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 		if ($revisedFileId == $newFileId) return null;
 
 		// Retrieve the latest revisions of the two submission files.
-		$revisedFile = $this->getLatestRevision($revisedFileId, $fileStage, $submissionId, $submissionVersion);
-		$newFile = $this->getLatestRevision($newFileId, $fileStage, $submissionId, $submissionVersion);
+		$revisedFile = $this->getLatestRevision($revisedFileId, $fileStage, $submissionId);
+		$newFile = $this->getLatestRevision($newFileId, $fileStage, $submissionId);
 		if (!($revisedFile && $newFile)) return null;
 
 		// Save identifying data of the changed file required for update.
@@ -532,8 +526,8 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 *  the selection to a given file stage.
 	 * @return integer the number of deleted file revisions
 	 */
-	function deleteAllRevisionsBySubmissionId($submissionId, $fileStage = null, $submissionVersion = null) {
-		return $this->_deleteInternally($submissionId, $fileStage, $submissionVersion);
+	function deleteAllRevisionsBySubmissionId($submissionId, $fileStage = null) {
+		return $this->_deleteInternally($submissionId, $fileStage);
 	}
 
 	/**
@@ -883,7 +877,7 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 */
 	private function _getInternally($submissionId = null, $fileStage = null, $fileId = null, $revision = null,
 			$assocType = null, $assocId = null, $stageId = null, $uploaderUserId = null,
-			$reviewRoundId = null, $latestOnly = false, $rangeInfo = null, $submissionVersion = null) {
+			$reviewRoundId = null, $latestOnly = false, $rangeInfo = null) {
 		// Retrieve the base query.
 		$sql = $this->baseQueryForFileSelection();
 
@@ -896,15 +890,10 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 					AND sf.revision '.($latestOnly ? '>=' : '=').' rrf.revision ';
 		}
 
-		// if (!$fileId && !$submissionVersion) {
-		// 	$submissionDao = Application::getSubmissionDAO();
-		// 	$submissionVersion = $submissionDao->getCurrentSubmissionVersionById($submissionId);
-		// }
-
 		// Filter the query.
 		list($filterClause, $params) = $this->_buildFileSelectionFilter(
 				$submissionId, $fileStage, $fileId, $revision,
-				$assocType, $assocId, $stageId, $uploaderUserId, $reviewRoundId, $submissionVersion);
+				$assocType, $assocId, $stageId, $uploaderUserId, $reviewRoundId);
 
 		// Did the user request all or only the latest revision?
 		if ($latestOnly) {
@@ -974,11 +963,11 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 */
 	private function _deleteInternally($submissionId = null, $fileStage = null, $fileId = null, $revision = null,
 			$assocType = null, $assocId = null, $stageId = null, $uploaderUserId = null,
-			$latestOnly = false, $submissionVersion = null) {
+			$latestOnly = false) {
 
 		// Identify all matched files.
 		$deletedFiles = $this->_getInternally($submissionId, $fileStage, $fileId, $revision,
-				$assocType, $assocId, $stageId, $uploaderUserId, null, $latestOnly, null, $submissionVersion);
+				$assocType, $assocId, $stageId, $uploaderUserId, null, $latestOnly, null);
 		if (empty($deletedFiles)) return 0;
 
 		foreach($deletedFiles as $deletedFile) { /* @var $deletedFile SubmissionFile */
@@ -1012,7 +1001,7 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 	 *  filter clause and the corresponding parameters.
 	 */
 	private function _buildFileSelectionFilter($submissionId, $fileStage,
-			$fileId, $revision, $assocType, $assocId, $stageId, $uploaderUserId, $reviewRoundId, $submissionVersion) {
+			$fileId, $revision, $assocType, $assocId, $stageId, $uploaderUserId, $reviewRoundId) {
 
 		// Make sure that at least one entity filter has been set.
 		assert($submissionId>0 || (int)$uploaderUserId || (int)$fileId || (int)$assocId);
@@ -1032,7 +1021,6 @@ class SubmissionFileDAO extends DAO implements PKPPubIdPluginDAO {
 			'sf.uploader_user_id' => $uploaderUserId,
 			'rrf.stage_id' => $stageId,
 			'rrf.review_round_id' => $reviewRoundId,
-			'sf.submission_version' => $submissionVersion,
 		);
 
 		// Build and return a SQL where clause and a parameter

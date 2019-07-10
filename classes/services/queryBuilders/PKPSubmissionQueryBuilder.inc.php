@@ -320,7 +320,7 @@ abstract class PKPSubmissionQueryBuilder extends BaseQueryBuilder {
 			if (count($words)) {
 				$q->leftJoin('publications as p', 'p.submission_id', '=', 's.submission_id')
 					->leftJoin('publication_settings as ps','p.publication_id','=','ps.publication_id')
-					->leftJoin('authors as au','s.submission_id','=','au.submission_id')
+					->leftJoin('authors as au','p.publication_id','=','au.publication_id')
 					->leftJoin('author_settings as aus', 'aus.author_id', '=', 'au.author_id');
 
 				foreach ($words as $word) {

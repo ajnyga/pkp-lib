@@ -204,6 +204,18 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 	}
 
 	/**
+	 * Get the oldest and most recent published dates of matching publications
+	 *
+	 * @param array $args Supports all args of self::getMany()
+	 * @return array [oldest, newest]
+	 */
+	public function getDateBoundaries($args) {
+		$publicationQO = $this->_getQueryBuilder($args)->getDateBoundaries();
+		$result = DAORegistry::getDAO('PublicationDAO')->retrieve($publicationQO->toSql(), $publicationQO->getBindings());
+		return [$result->fields[0], $result->fields[1]];
+	}
+
+	/**
 	 * @copydoc \PKP\Services\EntityProperties\EntityWriteInterface::validate()
 	 */
 	public function validate($action, $props, $allowedLocales, $primaryLocale) {
