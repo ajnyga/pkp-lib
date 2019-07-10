@@ -333,6 +333,12 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 		$publicationDao->updateObject($newPublication);
 		$newPublication = $this->get($newPublication->getId());
 
+		// Log an event when publication data is updated
+		$submission = Services::get('submission')->get($publication->getData('submissionId'));
+		import('lib.pkp.classes.log.SubmissionLog');
+		import('classes.log.SubmissionEventLogEntry');
+		SubmissionLog::logEvent($request, $submission, SUBMISSION_LOG_METADATA_UPDATE, 'submission.event.general.metadataUpdated');
+
 		return $newPublication;
 	}
 
