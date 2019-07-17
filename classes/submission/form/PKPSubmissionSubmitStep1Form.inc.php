@@ -336,6 +336,7 @@ class PKPSubmissionSubmitStep1Form extends SubmissionSubmitForm {
 			// Create a publication
 			$publication = new Publication();
 			$this->setPublicationData($publication, $this->submission);
+			$publication->setData('status', STATUS_QUEUED);
 			$publication = Services::get('publication')->add($publication, $request);
 			$this->submission = Services::get('submission')->edit($this->submission, ['currentPublicationId' => $publication->getId()], $request);
 

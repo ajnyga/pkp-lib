@@ -142,9 +142,9 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 						$values[$prop] = $publication->getAuthorString($args['userGroups']);
 					}
 					break;
-					case 'authorsStringShort':
-						$values[$prop] = $publication->getShortAuthorString();
-						break;
+				case 'authorsStringShort':
+					$values[$prop] = $publication->getShortAuthorString();
+					break;
 				case 'fullTitle':
 					$values[$prop] = $publication->getFullTitles();
 					break;
@@ -156,10 +156,6 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 						$publication->getData('galleys')
 					);
 					break;
-				case 'isPublished':
-					$values[$prop] = $this->isPublished($publication, $args);
-					break;
-
 				case 'urlPublished':
 					$values[$prop] = $dispatcher->url(
 						$request,
@@ -272,6 +268,45 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 	}
 
 	/**
+	 * Validate a publication against publishing requirements
+	 *
+	 * This validation check should return zero errors before
+	 * calling self::publish().
+	 *
+	 * It should not be necessary to repeat validation rules from
+	 * self::validate(). These rules should be applied during all add
+	 * or edit actions.
+	 *
+	 * This additional check should be used when a journal or press
+	 * wants to enforce particular publishing requirements, such as
+	 * requiring certain metadata or other information.
+	 *
+	 * @param Publication $publication
+	 * @param Submission $submission
+	 * @param array $allowedLocales array Which locales are allowed
+	 * @param string $primaryLocale string
+	 * @return array List of error messages. The array keys are property names
+	 */
+	public function validatePublish($publication, $submission, $allowedLocales, $primaryLocale) {
+
+		$errors = [];
+
+		// Don't allow declined submissions to be published
+		if ($submission->getData('status') === STATUS_DECLINED) {
+			$errors['declined'] = __('publication.required.declined');
+		}
+
+		// Don't allow a publication to be published before passing the review stage
+		if ($submission->getData('stageId') < WORKFLOW_STAGE_ID_EXTERNAL_REVIEW) {
+			$errors['reviewStage'] = __('publication.required.reviewStage');
+		}
+
+		\HookRegistry::call('Publication::validatePublish', [&$errors, $publication, $submission, $allowedLocales, $primaryLocale]);
+
+		return $errors;
+	}
+
+	/**
 	 * @copydoc \PKP\Services\EntityProperties\EntityWriteInterface::add()
 	 */
 	public function add($publication, $request) {
@@ -280,6 +315,10 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 		$publication = $this->get($publicationId);
 
 		\HookRegistry::call('Publication::add', [$publication, $request]);
+
+		// Update a submission's status based on the status of its publications
+		$submission = Services::get('submission')->get($publication->getData('submissionId'));
+		$submission = Services::get('submission')->updateStatus($submission);
 
 		return $publication;
 	}
@@ -297,7 +336,8 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 	public function version($publication, $request) {
 		$newPublication = clone $publication;
 		$newPublication->setData('id', null);
-		$newPublication->setData('datePublished', null);
+		$newPublication->setData('datePublished', '');
+		$newPublication->setData('status', STATUS_QUEUED);
 		$newPublication->setData('lastModified', Core::getCurrentDate());
 		$newPublication = $this->add($newPublication, $request);
 
@@ -337,7 +377,87 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 		$submission = Services::get('submission')->get($publication->getData('submissionId'));
 		import('lib.pkp.classes.log.SubmissionLog');
 		import('classes.log.SubmissionEventLogEntry');
-		SubmissionLog::logEvent($request, $submission, SUBMISSION_LOG_METADATA_UPDATE, 'submission.event.general.metadataUpdated');
+		\SubmissionLog::logEvent($request, $submission, SUBMISSION_LOG_METADATA_UPDATE, 'submission.event.general.metadataUpdated');
+
+		return $newPublication;
+	}
+
+	/**
+	 * Publish a publication or schedule it for publication at a
+	 * future date
+	 *
+	 * @param Publication $publication
+	 * @return Publlication
+	 */
+	public function publish($publication) {
+		$newPublication = clone $publication;
+
+		if (!$newPublication->getData('datePublished')) {
+			$newPublication->setData('datePublished', Core::getCurrentDate());
+		}
+
+		if (strtotime($newPublication->getData('datePublished')) <= strtotime(Core::getCurrentDate())) {
+			$newPublication->setData('status', STATUS_PUBLISHED);
+		} else {
+			$newPublication->setData('status', STATUS_SCHEDULED);
+		}
+
+		$newPublication->stampModified();
+
+		\HookRegistry::call('Publication::publish', [$newPublication, $publication]);
+
+		DAORegistry::getDAO('PublicationDAO')->updateObject($newPublication);
+
+		$newPublication = $this->get($newPublication->getId());
+		$submission = Services::get('submission')->get($newPublication->getData('submissionId'));
+
+		// Update a submission's status based on the status of its publications
+		if ($newPublication->getData('status') !== $publication->getData('status')) {
+			$submission = Services::get('submission')->updateStatus($submission);
+		}
+
+		// Log an event when publication is published. Adjust the message depending
+		// on whether this is the first publication or a subsequent version
+		if (count($submission->getData('publications')) > 1) {
+			$msg = $newPublication->getData('status') === STATUS_SCHEDULED ? 'publication.event.versionScheduled' : 'publication.event.versionPublished';
+		} else {
+			$msg = $newPublication->getData('status') === STATUS_SCHEDULED ? 'publication.event.scheduled' : 'publication.event.published';
+		}
+		import('lib.pkp.classes.log.SubmissionLog');
+		import('classes.log.SubmissionEventLogEntry');
+		\SubmissionLog::logEvent(\Application::get()->getRequest(), $submission, SUBMISSION_LOG_METADATA_PUBLISH, $msg);
+
+		return $newPublication;
+	}
+
+	/**
+	 * Unpublish a publication that has already been published
+	 *
+	 * @param Publication $publication
+	 * @return Publlication
+	 */
+	public function unpublish($publication) {
+		$newPublication = clone $publication;
+		$newPublication->setData('status', STATUS_QUEUED);
+		$newPublication->stampModified();
+
+		\HookRegistry::call('Publication::unpublish', [$newPublication, $publication]);
+
+		DAORegistry::getDAO('PublicationDAO')->updateObject($newPublication);
+		$newPublication = $this->get($newPublication->getId());
+		$submission = Services::get('submission')->get($newPublication->getData('submissionId'));
+
+		// Update a submission's status based on the status of its publications
+		if ($newPublication->getData('status') !== $publication->getData('status')) {
+			$submission = Services::get('submission')->updateStatus($submission);
+		}
+
+		// Log an event when publication is unpublished. Adjust the message depending
+		// on whether this is the first publication or a subsequent version
+		$msg = count($submission->getData('publications')) > 1 ? 'publication.event.versionUnpublished' : 'publication.event.unpublished';
+		import('lib.pkp.classes.log.SubmissionLog');
+		import('classes.log.SubmissionEventLogEntry');
+		\SubmissionLog::logEvent(\Application::get()->getRequest(), $submission, SUBMISSION_LOG_METADATA_UNPUBLISH, $msg);
 
 		return $newPublication;
 	}
@@ -355,18 +475,10 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 			Services::get('author')->delete($contributor);
 		}
 
-		\HookRegistry::call('Publication::delete', [$publication]);
-	}
+		// Update a submission's status based on the status of its remaining publications
+		$submission = Services::get('submission')->get($publication->getData('submissionId'));
+		$submission = $submission = Services::get('submission')->updateStatus($submission);
 
-	/**
-	 * Is this publication published?
-	 *
-	 * @param Publication $publication
-	 * @param array $dependencies
-	 * @return boolean
-	 */
-	public function isPublished($publication, $dependencies = []) {
-		$datePublished = $publication->getData('datePublished');
-		return $datePublished && strtotime($datePublished) < strtotime(Core::getCurrentDate());
+		\HookRegistry::call('Publication::delete', [$publication]);
 	}
 }

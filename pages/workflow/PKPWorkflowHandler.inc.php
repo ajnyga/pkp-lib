@@ -454,14 +454,36 @@ abstract class PKPWorkflowHandler extends Handler {
 			array('submissionId' => $submission->getId())
 		);
 
+		$publishUrl = $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'modals.publish.PublishHandler',
+			'publish',
+			null,
+			[
+				'submissionId' => $submission->getId(),
+				'publicationId' => '__publicationId__',
+			]
+		);
+
 		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
 		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
-		$issueEntryForm = new APP\components\forms\publication\IssueEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
+		$journalEntryForm = new APP\components\forms\publication\JournalEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
+
+		// Import constants
+		import('classes.article.Submission');
+		import('classes.components.forms.publication.PublishForm');
 
 		$templateMgr->setConstants([
+			'STATUS_QUEUED',
+			'STATUS_PUBLISHED',
+			'STATUS_DECLINED',
+			'STATUS_SCHEDULED',
 			'FORM_TITLE_ABSTRACT',
 			'FORM_PUBLICATION_LICENSE',
-			'FORM_ISSUE_ENTRY',
+			'FORM_JOURNAL_ENTRY',
+			'FORM_PUBLISH',
 		]);
 
 		$submissionProps = Services::get('submission')->getFullProperties(
@@ -476,7 +498,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			'components' => [
 				FORM_TITLE_ABSTRACT => $titleAbstractForm->getConfig(),
 				FORM_PUBLICATION_LICENSE => $publicationLicenseForm->getConfig(),
-				FORM_ISSUE_ENTRY => $issueEntryForm->getConfig(),
+				FORM_JOURNAL_ENTRY => $journalEntryForm->getConfig(),
 			],
 			'contributorsGridUrl' => $contributorsGridUrl,
 			'csrfToken' => $request->getSession()->getCSRFToken(),
@@ -484,8 +506,10 @@ abstract class PKPWorkflowHandler extends Handler {
 			'publicationFormIds' => [
 				FORM_TITLE_ABSTRACT,
 				FORM_PUBLICATION_LICENSE,
-				FORM_ISSUE_ENTRY,
+				FORM_JOURNAL_ENTRY,
+				FORM_PUBLISH,
 			],
+			'publishUrl' => $publishUrl,
 			'representationsGridUrl' => $this->_getRepresentationsGridUrl($request, $submission),
 			'submission' => $submissionProps,
 			'submissionApiUrl' => $submissionApiUrl,
@@ -493,12 +517,17 @@ abstract class PKPWorkflowHandler extends Handler {
 			'supportsReferences' => !!$submissionContext->getData('citations'),
 			'i18n' => [
 				'activityLog' => __('submission.list.infoCenter'),
+				'cancel' => __('common.cancel'),
+				'ok' => __('common.ok'),
 				'preview' => __('common.preview'),
 				'publicationTabsLabel' => __('publication.version.details'),
 				'publish' => __('publication.publish'),
+				'save' => __('common.save'),
 				'schedulePublication' => __('editor.article.schedulePublication'),
 				'status' => __('semicolon', ['label' => __('common.status')]),
 				'submissionLibrary' => __('grid.libraryFiles.submission.title'),
+				'unpublishConfirm' => __('publication.unpublish.confirm'),
+				'unscheduleConfirm' => __('publication.unschedule.confirm'),
 				'view' => __('common.view'),
 				'version' => __('semicolon', ['label' => __('admin.version')]),
 			],

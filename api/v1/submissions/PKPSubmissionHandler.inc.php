@@ -56,6 +56,11 @@ class PKPSubmissionHandler extends APIHandler {
 					'handler' => [$this, 'getPublication'],
 					'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT, ROLE_ID_REVIEWER, ROLE_ID_AUTHOR],
 				],
+				[
+					'pattern' => $this->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/publish',
+					'handler' => [$this, 'publishPublication'],
+					'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
+				],
 			],
 			'POST' => [
 				[
@@ -83,6 +88,11 @@ class PKPSubmissionHandler extends APIHandler {
 				[
 					'pattern' => $this->getEndpointPattern() . '/{submissionId}/publications/{publicationId}',
 					'handler' => [$this, 'editPublication'],
+					'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
+				],
+				[
+					'pattern' => $this->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/publish',
+					'handler' => [$this, 'publishPublication'],
 					'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
 				],
 				[
@@ -127,6 +137,8 @@ class PKPSubmissionHandler extends APIHandler {
 			'addPublication',
 			'versionPublication',
 			'editPublication',
+			'checkPublishRequirements',
+			'publishPublication',
 			'unpublishPublication',
 			'deletePublication',
 		];
@@ -334,7 +346,7 @@ class PKPSubmissionHandler extends APIHandler {
 
 	/**
 	 * Edit a submission
-   *
+	 *
 	 * @param $slimRequest Request Slim request object
 	 * @param $response Response object
 	 * @param array $args arguments
@@ -383,7 +395,7 @@ class PKPSubmissionHandler extends APIHandler {
 
 	/**
 	 * Delete a submission
-   *
+	 *
 	 * @param $slimRequest Request Slim request object
 	 * @param $response Response object
 	 * @param array $args arguments
@@ -475,14 +487,14 @@ class PKPSubmissionHandler extends APIHandler {
 		$data = [
 			'itemsMax' => Services::get('publication')->getMax($allowedParams),
 			'items' => $items,
-    ];
+		];
 
 		return $response->withJson($data, 200);
 	}
 
 	/**
 	 * Get one of this submission's publications
-   *
+	 *
 	 * @param $slimRequest Request Slim request object
 	 * @param $response Response object
 	 * @param array $args arguments
@@ -576,7 +588,7 @@ class PKPSubmissionHandler extends APIHandler {
 
 	/**
 	 * Edit one of this submission's publications
-   *
+	 *
 	 * @param $slimRequest Request Slim request object
 	 * @param $response Response object
 	 * @param array $args arguments
@@ -596,12 +608,18 @@ class PKPSubmissionHandler extends APIHandler {
 		}
 
 		// Publications can not be edited when they are published
-		if (Services::get('publication')->isPublished($publication)) {
+		if ($publication->getData('status') === STATUS_PUBLISHED) {
 			return $response->withStatus(403)->withJsonError('api.publication.403.cantEditPublished');
 		}
 
 		$params = $this->convertStringsToSchema(SCHEMA_PUBLICATION, $slimRequest->getParsedBody());
 		$params['id'] = $publication->getId();
+
+		// Don't allow the status to be modified through the API. The `/publish` and /unpublish endpoints
+		// should be used instead.
+		if (array_key_exists('status', $params)) {
+			return $response->withStatus(403)->withJsonError('api.publication.403.cantEditStatus');
+		}
 
 		$submissionContext = $request->getContext();
 		if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
@@ -624,8 +642,64 @@ class PKPSubmissionHandler extends APIHandler {
 	}
 
 	/**
+	 * Publish one of this submission's publications
+	 *
+	 * If this is a GET request, it will run the pre-publish validation
+	 * checks and return errors but it will not perform the final
+	 * publication step.
+	 *
+	 * @param $slimRequest Request Slim request object
+	 * @param $response Response object
+	 * @param array $args arguments
+	 * @return Response
+	 */
+	public function publishPublication($slimRequest, $response, $args) {
+		$request = $this->getRequest();
+		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+		$publication = Services::get('publication')->get((int) $args['publicationId']);
+
+		if (!$publication) {
+			return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+		}
+
+		if ($submission->getId() !== $publication->getData('submissionId')) {
+			return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
+		}
+
+		if ($publication->getData('status') === STATUS_PUBLISHED) {
+			return $response->withStatus(403)->withJsonError('api.publication.403.alreadyPublished');
+		}
+
+		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
+
+		$submissionContext = $request->getContext();
+		if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
+			$submissionContext = Services::get('context')->get($submission->getData('contextId'));
+		}
+		$primaryLocale = $submissionContext->getPrimaryLocale();
+		$allowedLocales = $submissionContext->getSupportedLocales();
+
+		$errors = Services::get('publication')->validatePublish($publication, $submission, $allowedLocales, $primaryLocale);
+
+		if (!empty($errors)) {
+			return $response->withStatus(400)->withJson($errors);
+		}
+
+		// Don't publish the publication for GET requests
+		if ($slimRequest->isGet()) {
+			return $response->withJson([], 200);
+		}
+
+		$publication = Services::get('publication')->publish($publication);
+
+		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+
+		return $response->withJson($publicationProps, 200);
+	}
+
+	/**
 	 * Unpublish one of this submission's publications
-   *
+	 *
 	 * @param $slimRequest Request Slim request object
 	 * @param $response Response object
 	 * @param array $args arguments
@@ -644,11 +718,11 @@ class PKPSubmissionHandler extends APIHandler {
 			return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
 		}
 
-		if (!Services::get('publication')->isPublished($publication)) {
+		if (!in_array($publication->getData('status'), [STATUS_PUBLISHED, STATUS_SCHEDULED])) {
 			return $response->withStatus(403)->withJsonError('api.publication.403.alreadyUnpublished');
 		}
 
-		$publication = Services::get('publication')->edit($publication, ['datePublished' => null], $request);
+		$publication = Services::get('publication')->unpublish($publication);
 
 		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
 
@@ -660,7 +734,7 @@ class PKPSubmissionHandler extends APIHandler {
 	 *
 	 * Published publications can not be deleted. First you must unpublish them.
 	 * See self::unpublishPublication().
-   *
+	 *
 	 * @param $slimRequest Request Slim request object
 	 * @param $response Response object
 	 * @param array $args arguments
@@ -679,7 +753,7 @@ class PKPSubmissionHandler extends APIHandler {
 			return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
 		}
 
-		if (Services::get('publication')->isPublished($publication)) {
+		if ($publication->getData('status') === STATUS_PUBLISHED) {
 			return $response->withStatus(403)->withJsonError('api.publication.403.cantDeletePublished');
 		}
 

@@ -30,17 +30,18 @@ class PKPPublicationDAO extends SchemaDAO {
 	public $primaryKeyColumn = 'publication_id';
 
 	/** @copydoc SchemaDao::$primaryTableColumns */
-  public $primaryTableColumns = [
-    'id' => 'publication_id',
-    'accessStatus' => 'access_status',
-    'datePublished' => 'date_published',
+	public $primaryTableColumns = [
+		'id' => 'publication_id',
+		'accessStatus' => 'access_status',
+		'datePublished' => 'date_published',
 		'lastModified' => 'last_modified',
 		'locale' => 'locale',
-    'primaryContactId' => 'primary_contact_id',
-    'publicationDateType' => 'publication_date_type',
-    'publicationType' => 'publication_type',
-    'sectionId' => 'section_id',
-    'submissionId' => 'submission_id',
+		'primaryContactId' => 'primary_contact_id',
+		'publicationDateType' => 'publication_date_type',
+		'publicationType' => 'publication_type',
+		'sectionId' => 'section_id',
+		'submissionId' => 'submission_id',
+		'status' => 'status',
 	];
 
 	/** @var array List of properties that are stored in the controlled_vocab tables. */

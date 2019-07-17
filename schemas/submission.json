@@ -180,16 +180,16 @@
 		},
 		"status": {
 			"type": "integer",
-			"description": "Whether the submission is Published, Declined or Queued (still in the workflow). One of `STATUS_QUEUED`, `STATUS_PUBLISHED` or `STATUS_DECLINED`. Default is `STATUS_QUEUED`.",
+			"description": "Whether the submission is Published, Declined, Scheduled or Queued (still in the workflow). One of the `STATUS_*` constants. Default is `STATUS_QUEUED`.",
 			"apiSummary": true,
 			"default": 1,
 			"validation": [
-				"in:1,2,3,4"
+				"in:1,2,3,4,5"
 			]
 		},
 		"statusLabel": {
 			"type": "string",
-			"description": "A human-readable version of the submission's status. It will be Published, Declined or Queued (still in the workflow).",
+			"description": "A human-readable version of the submission's status. It will be Published, Declined, Queued (still in the workflow) or Scheduled.",
 			"readOnly": true,
 			"apiSummary": true
 		},

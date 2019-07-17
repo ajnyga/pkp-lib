@@ -26,6 +26,7 @@
 define('STATUS_QUEUED', 1);
 define('STATUS_PUBLISHED', 3);
 define('STATUS_DECLINED', 4);
+define('STATUS_SCHEDULED', 5);
 
 // License settings (internal use only)
 define ('PERMISSIONS_FIELD_LICENSE_URL', 1);
@@ -58,10 +59,11 @@ abstract class PKPSubmission extends DataObject {
 		if (!$publicationId || empty($publications)) {
 			return null;
 		}
-		$currentPublications = array_filter($publications, function($publication) use ($publicationId) {
-			return $publicationId === $publication->getId();
-		});
-		return empty($publications) ? null : $currentPublications[0];
+		foreach ($publications as $publication) {
+			if ($publication->getId() === $publicationId) {
+				return $publication;
+			}
+		}
 	}
 
 	/**
@@ -106,6 +108,7 @@ abstract class PKPSubmission extends DataObject {
 				STATUS_QUEUED => 'submissions.queued',
 				STATUS_PUBLISHED => 'submission.status.published',
 				STATUS_DECLINED => 'submission.status.declined',
+				STATUS_SCHEDULED => 'submission.status.scheduled',
 			);
 		}
 		return $statusMap;

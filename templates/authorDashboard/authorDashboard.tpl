@@ -93,6 +93,13 @@
 			<tab id="publication" label="{translate key="submission.issueEntry.publicationMetadata"}">
 				<div class="pkpPublication" ref="publication" aria-live="polite">
 					<pkp-header class="pkpPublication__header">
+						<span class="pkpPublication__status">
+							<strong>{{ i18n.status }}</strong>
+							<span v-if="workingPublication.status === getConstant('STATUS_QUEUED') && workingPublication.id === currentPublication.id" class="pkpPublication__statusUnpublished">{translate key="publication.status.unscheduled"}</span>
+							<span v-else-if="workingPublication.status === getConstant('STATUS_SCHEDULED')">{translate key="submissions.scheduled"}</span>
+							<span v-else-if="workingPublication.status === getConstant('STATUS_PUBLISHED')" class="pkpPublication__statusPublished">{translate key="publication.status.published"}</span>
+							<span v-else class="pkpPublication__statusUnpublished">{translate key="publication.status.unpublished"}</span>
+						</span>
 						<span v-if="submission.publications.length > 1" class="pkpPublication__version">
 							<strong tabindex="0">{{ i18n.version }}</strong> {{ workingPublication.id }}
 							<dropdown
@@ -109,30 +116,18 @@
 											@click="setWorkingPublicationId(publication)"
 										>
 											{{ publication.id }} /
-											<template v-if="publication.isPublished">
-												{translate key="publication.status.published"}
-											</template>
-											<template v-else-if="!isPublished && publication.issueId">
-												{translate key="submissions.scheduled"}
-											</template>
-											<template v-else>
-												{translate key="publication.status.unpublished"}
-											</template>
+											<template v-if="publication.status === getConstant('STATUS_QUEUED') && publication.id === currentPublication.id">{translate key="publication.status.unscheduled"}</template>
+											<template v-else-if="publication.status === getConstant('STATUS_SCHEDULED')">{translate key="submissions.scheduled"}</template>
+											<template v-else-if="publication.status === getConstant('STATUS_PUBLISHED')">{translate key="publication.status.published"}</template>
+											<template v-else>{translate key="publication.status.unpublished"}</template>
 										</button>
 									</li>
 								</ul>
 							</dropdown>
 						</span>
-						<span class="pkpPublication__status">
-							<strong>{{ i18n.status }}</strong>
-							<span v-if="!isPublished && !workingPublication.issueId">{translate key="publication.status.unscheduled"}</span>
-							<span v-else-if="!isPublished && workingPublication.issueId">{translate key="submissions.scheduled"}</span>
-							<span v-else-if="workingPublication.isPublished" class="pkpPublication__statusPublished">{translate key="publication.status.published"}</span>
-							<span v-else class="pkpPublication__statusUnpublished">{translate key="publication.status.unpublished"}</span>
-						</span>
 					</pkp-header>
 					<div
-						v-if="workingPublication.isPublished"
+						v-if="workingPublication.status === getConstant('STATUS_PUBLISHED')"
 						class="pkpPublication__versionPublished"
 					>
 						{translate key="publication.editDisabled"}

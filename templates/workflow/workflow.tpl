@@ -9,17 +9,7 @@
  *}
 
 {strip}
-	{assign var=primaryAuthor value=$submission->getPrimaryAuthor()}
-	{if !$primaryAuthor}
-		{assign var=authors value=$submission->getAuthors()}
-		{assign var=primaryAuthor value=$authors[0]}
-	{/if}
-	{assign var=submissionTitleSafe value=$submission->getLocalizedTitle()|strip_unsafe_html}
-	{if $primaryAuthor}
-		{assign var="pageTitleTranslated" value=$primaryAuthor->getFullName()|concat:", ":$submissionTitleSafe}
-	{else}
-		{assign var="pageTitleTranslated" value=$submissionTitleSafe}
-	{/if}
+	{assign var=pageTitleTranslated value=$submission->getShortAuthorString()|strip_unsafe_html|concat:"; ":$submission->getLocalizedTitle()|strip_unsafe_html}
 	{include file="common/header.tpl" suppressPageTitle=true}
 {/strip}
 
@@ -28,6 +18,20 @@
 	<div id="workflow-{$uuid}" class="pkpWorkflow">
 		<pkp-header :is-one-line="true" class="pkpWorkflow__header">
 			<h1 class="pkpWorkflow__identification">
+				<badge
+					v-if="submission.status === getConstant('STATUS_PUBLISHED')"
+					class="pkpWorkflow__identificationStatus"
+					:is-success="true"
+				>
+					{translate key="publication.status.published"}
+				</badge>
+				<badge
+					v-else-if="submission.status === getConstant('STATUS_SCHEDULED')"
+					class="pkpWorkflow__identificationStatus"
+					:is-primary="true"
+				>
+					{translate key="publication.status.scheduled"}
+				</badge>
 				<span class="pkpWorkflow__identificationId">{{ submission.id }}</span>
 				<span class="pkpWorkflow__identificationDivider">/</span>
 				<span class="pkpWorkflow__identificationAuthor">
@@ -41,7 +45,7 @@
 			<template slot="actions">
 				<pkp-button
 					element="a"
-					:label="isPublished ? i18n.view : i18n.preview"
+					:label="submission.status === getConstant('STATUS_PUBLISHED') ? i18n.view : i18n.preview"
 					:href="submission.urlPublished"
 				></pkp-button>
 				<pkp-button
@@ -79,6 +83,13 @@
 			<tab id="publication" label="{translate key="submission.issueEntry.publicationMetadata"}">
 				<div class="pkpPublication" ref="publication" aria-live="polite">
 					<pkp-header class="pkpPublication__header">
+						<span class="pkpPublication__status">
+							<strong>{{ i18n.status }}</strong>
+							<span v-if="workingPublication.status === getConstant('STATUS_QUEUED') && workingPublication.id === currentPublication.id" class="pkpPublication__statusUnpublished">{translate key="publication.status.unscheduled"}</span>
+							<span v-else-if="workingPublication.status === getConstant('STATUS_SCHEDULED')">{translate key="submissions.scheduled"}</span>
+							<span v-else-if="workingPublication.status === getConstant('STATUS_PUBLISHED')" class="pkpPublication__statusPublished">{translate key="publication.status.published"}</span>
+							<span v-else class="pkpPublication__statusUnpublished">{translate key="publication.status.unpublished"}</span>
+						</span>
 						<span v-if="submission.publications.length > 1" class="pkpPublication__version">
 							<strong tabindex="0">{{ i18n.version }}</strong> {{ workingPublication.id }}
 							<dropdown
@@ -95,41 +106,38 @@
 											@click="setWorkingPublicationId(publication)"
 										>
 											{{ publication.id }} /
-											<template v-if="publication.isPublished">
-												{translate key="publication.status.published"}
-											</template>
-											<template v-else-if="!isPublished && publication.issueId">
-												{translate key="submissions.scheduled"}
-											</template>
-											<template v-else>
-												{translate key="publication.status.unpublished"}
-											</template>
+											<template v-if="publication.status === getConstant('STATUS_QUEUED') && publication.id === currentPublication.id">{translate key="publication.status.unscheduled"}</template>
+											<template v-else-if="publication.status === getConstant('STATUS_SCHEDULED')">{translate key="submissions.scheduled"}</template>
+											<template v-else-if="publication.status === getConstant('STATUS_PUBLISHED')">{translate key="publication.status.published"}</template>
+											<template v-else>{translate key="publication.status.unpublished"}</template>
 										</button>
 									</li>
 								</ul>
 							</dropdown>
 						</span>
-						<span class="pkpPublication__status">
-							<strong>{{ i18n.status }}</strong>
-							<span v-if="!isPublished && !workingPublication.issueId">{translate key="publication.status.unscheduled"}</span>
-							<span v-else-if="!isPublished && workingPublication.issueId">{translate key="submissions.scheduled"}</span>
-							<span v-else-if="workingPublication.isPublished" class="pkpPublication__statusPublished">{translate key="publication.status.published"}</span>
-							<span v-else class="pkpPublication__statusUnpublished">{translate key="publication.status.unpublished"}</span>
-						</span>
 						<template slot="actions">
 							<pkp-button
-								v-if="!workingPublication.isPublished"
-								:label="isPublished ? i18n.publish : i18n.schedulePublication"
+								v-if="workingPublication.status === getConstant('STATUS_QUEUED')"
+								ref="publish"
+								:label="submission.status === getConstant('STATUS_PUBLISHED') ? i18n.publish : i18n.schedulePublication"
+								@click="openPublish"
+							></pkp-button>
+							<pkp-button
+								v-else-if="workingPublication.status === getConstant('STATUS_SCHEDULED')"
+								label="{translate key="publication.unschedule"}"
+								:is-warnable="true"
+								@click="openUnpublish"
 							></pkp-button>
 							<pkp-button
 								v-else-if="canCreateNewVersion"
+								ref="createVersion"
 								label="{translate key="publication.createVersion"}"
 								@click="createVersion"
 							></pkp-button>
 						</template>
 					</pkp-header>
 					<div
-						v-if="workingPublication.isPublished"
+						v-if="workingPublication.status === getConstant('STATUS_PUBLISHED')"
 						class="pkpPublication__versionPublished"
 					>
 						{translate key="publication.editDisabled"}
@@ -160,8 +168,8 @@
 						<tab id="license" label="{translate key="publication.publicationLicense"}">
 							<pkp-form v-bind="components.{$smarty.const.FORM_PUBLICATION_LICENSE}" @set="set" />
 						</tab>
-						<tab id="issue" label="{translate key="publication.issueEntry"}">
-							<pkp-form v-bind="components.{$smarty.const.FORM_ISSUE_ENTRY}" @set="set" />
+						<tab id="issue" label="{translate key="publication.journalEntry"}">
+							<pkp-form v-bind="components.{$smarty.const.FORM_JOURNAL_ENTRY}" @set="set" />
 						</tab>
 						{call_hook name="Template::Workflow::Publication"}
 					</tabs>

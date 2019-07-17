@@ -412,6 +412,8 @@
 	<message key="submission.status.unassigned">Unassigned</message>
 	<message key="submission.status.declined">Declined</message>
 	<message key="submission.status.published">Published</message>
+	<message key="submission.status.scheduled">Scheduled</message>
+
 
 	<message key="submission.submit.uploadStep">1. Upload File</message>
 	<message key="submission.submit.uploadSubmissionFile">Upload Submission File</message>
@@ -527,6 +529,7 @@
 	<message key="submission.event.fileAuditUploaded">"{$name}" ({$username}) has completed an audit and uploaded "{$file}."</message>
 	<message key="submission.event.signoffSignoff">"{$name}" ({$username}) has signed off on the signoff for "{$file}."</message>
 	<message key="submission.event.proofsApproved">"{$name}" ({$username}) has approved the proofs for "{$formatName}."</message>
+
 	<message key="submission.overview">Submission Overview</message>
 	<message key="submission.description">Description</message>
 	<message key="submission.stageNotInitiated">Stage not initiated.</message>
@@ -667,16 +670,31 @@
 	<message key="publication.copyrightYearBasis.issueDescription">The copyright year will be set automatically when this is published in an issue.</message>
 	<message key="publication.createVersion">Create New Version</message>
 	<message key="publication.editDisabled">This version has been published and can not be edited.</message>
+	<message key="publication.event.published">The submission was published.</message>
+	<message key="publication.event.scheduled">The submission was scheduled for publication.</message>
+	<message key="publication.event.unpublished">The submission was unpublished.</message>
+	<message key="publication.event.versionPublished">A new version was published.</message>
+	<message key="publication.event.versionScheduled">A new version was scheduled for publication.</message>
+	<message key="publication.event.versionUnpublished">A version was removed from publication.</message>
 	<message key="publication.invalidSubmission">The submission for this publication could not be found.</message>
-	<message key="publication.issueEntry">Issue Entry</message>
 	<message key="publication.publicationLicense">Permissions &amp; Disclosure</message>
 	<message key="publication.publicationLicense.success">The copyright and license information have been updated.</message>
 	<message key="publication.publish">Publish</message>
+	<message key="publication.publish.confirmation">All publication requirements have been met. Are you sure you want to publish this?</message>
+	<message key="publication.publish.requirements">The following requirements must be met before this can be published.</message>
+	<message key="publication.publish.success">The publication status has been successfully changed.</message>
+	<message key="publication.required.declined">A declined submission can not be published.</message>
+	<message key="publication.required.reviewStage">The submission must be in the Copyediting or Production stages before it can be published.</message>
 	<message key="publication.status.published">Published</message>
+	<message key="publication.status.scheduled">Scheduled</message>
 	<message key="publication.status.unpublished">Unpublished</message>
 	<message key="publication.status.unscheduled">Unscheduled</message>
 	<message key="publication.titleAbstract">Title &amp; Abstract</message>
 	<message key="publication.titleAbstract.success">The title and abstract have been updated.</message>
+	<message key="publication.unpublish">Unpublish</message>
+	<message key="publication.unpublish.confirm">Are you sure you don't want this to be published?</message>
+	<message key="publication.unschedule">Unschedule</message>
+	<message key="publication.unschedule.confirm">Are you sure you don't want this scheduled for publication?</message>
 	<message key="publication.version.all">All Versions</message>
 	<message key="publication.version.details">Publication details for version {$version}</message>
 	<message key="publication.wordCountLong">The abstract is too long. It shoud be {$limit} words or less. It is currently {$count} words long.</message>

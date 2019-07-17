@@ -801,4 +801,67 @@ abstract class PKPSubmissionService implements EntityPropertyInterface, EntityRe
 		}
 		return false;
 	}
+
+	/**
+	 * Update a submission's status and current publication id if necessary
+	 *
+	 * Checks the status of the submission's publications and sets
+	 * the appropriate status and current publication id.
+	 *
+	 * @param Submission $submission
+	 * @return Submission
+	 */
+	public function updateStatus($submission) {
+		$status = $newStatus = $submission->getData('status');
+		$currentPublicationId = $submission->getData('currentPublicationId');
+		$publications = $submission->getData('publications');
+
+		// There should always be at least one publication for a submission. If
+		// not, an error has occurred in the code and will cause problems.
+		if (empty($publications)) {
+			throw new Exception('Tried to update the status of submission ' . $submission->getId() . ' and no publications were found.');
+		}
+
+		// Get the new current publication after status changes or deletions
+		// Use the latest published publication or, failing that, the latest publication
+		$newCurrentPublicationId = array_reduce($publications, function($a, $b) {
+			return $b->getData('status') === STATUS_PUBLISHED && $b->getId() > $a ? $b->getId() : $a;
+		}, 0);
+		if (!$newCurrentPublicationId) {
+			$newCurrentPublicationId = array_reduce($publications, function($a, $b) {
+				return $a > $b->getId() ? $a : $b->getId();
+			}, 0);
+		}
+
+		// Declined submissions should remain declined even if their
+		// publications change
+		if ($status !== STATUS_DECLINED) {
+			$newStatus = STATUS_QUEUED;
+			foreach ($publications as $publication) {
+				if ($publication->getData('status') === STATUS_PUBLISHED) {
+					$newStatus = STATUS_PUBLISHED;
+					break;
+				}
+				if ($publication->getData('status') === STATUS_SCHEDULED) {
+					$newStatus = STATUS_SCHEDULED;
+					continue;
+				}
+			}
+		}
+
+		\HookRegistry::call('Submission::updateStatus', [&$status, $submission]);
+
+		$updateParams = [];
+		if ($status !== $newStatus) {
+			$updateParams['status'] = $newStatus;
+		}
+		if ($currentPublicationId !== $newCurrentPublicationId) {
+			$updateParams['currentPublicationId'] = $newCurrentPublicationId;
+		}
+		if (!empty($updateParams)) {
+			$submission = $this->edit($submission, $updateParams, Application::get()->getRequest());
+		}
+
+		return $submission;
+	}
 }

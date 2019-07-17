@@ -179,7 +179,7 @@ class PKPAuthorService implements EntityReadInterface, EntityWriteInterface, Ent
 				$publication = Services::get('publication')->get($props['publicationId']);
 				if (!$publication) {
 					$validator->errors()->add('publicationId', __('author.publicationNotFound'));
-				} else if (Services::get('publication')->isPublished($publication)) {
+				} else if ($publication->getData('status') === STATUS_PUBLISHED) {
 					$validator->errors()->add('publicationId', __('author.editPublishedDisabled'));
 				}
 			}

@@ -68,12 +68,7 @@ abstract class SchemaDAO extends DAO {
 		$schema = $schemaService->get($this->schemaName);
 		$sanitizedProps = $schemaService->sanitize($this->schemaName, $object->_data);
 
-		$primaryDbProps = [];
-		foreach ($this->primaryTableColumns as $propName => $columnName) {
-			if (isset($sanitizedProps[$propName])) {
-				$primaryDbProps[$columnName] = $sanitizedProps[$propName];
-			}
-		}
+		$primaryDbProps = $this->_getPrimaryDbProps($object);
 
 		if (empty($primaryDbProps)) {
 			throw new Exception('Tried to insert ' . get_class($object) . ' without any properties for the ' . $this->tableName . ' table.');
@@ -137,12 +132,7 @@ abstract class SchemaDAO extends DAO {
 		$schema = $schemaService->get($this->schemaName);
 		$sanitizedProps = $schemaService->sanitize($this->schemaName, $object->_data);
 
-		$primaryDbProps = [];
-		foreach ($this->primaryTableColumns as $propName => $columnName) {
-			if ($propName !== 'id' && array_key_exists($propName, $sanitizedProps)) {
-				$primaryDbProps[$columnName] = $this->convertToDB($sanitizedProps[$propName], $schema->properties->{$propName}->type);
-			}
-		}
+		$primaryDbProps = $this->_getPrimaryDbProps($object);
 
 		$set = join('=?,', array_keys($primaryDbProps)) . '=?';
 		$this->update(
@@ -276,5 +266,33 @@ abstract class SchemaDAO extends DAO {
 	 */
 	public function getInsertId() {
 		return $this->_getInsertId($this->tableName, $this->primaryKeyColumn);
+	}
+
+	/**
+	 * A helper function to compile the key/value set for the primary table
+	 *
+	 * @param DataObject
+	 * @return array
+	 */
+	private function _getPrimaryDbProps($object) {
+		$schema = Services::get('schema')->get($this->schemaName);
+		$sanitizedProps = Services::get('schema')->sanitize($this->schemaName, $object->_data);
+
+		$primaryDbProps = [];
+		foreach ($this->primaryTableColumns as $propName => $columnName) {
+			if ($propName !== 'id' && array_key_exists($propName, $sanitizedProps)) {
+				$primaryDbProps[$columnName] = $this->convertToDB($sanitizedProps[$propName], $schema->properties->{$propName}->type);
+				// Convert empty string values for DATETIME columns into null values
+				// because an empty string can not be saved to a DATETIME column
+				if ($primaryDbProps[$columnName] === ''
+						&& isset($schema->properties->{$propName}->validation)
+						&& in_array('date_format:Y-m-d H:i:s', $schema->properties->{$propName}->validation)
+				) {
+					$primaryDbProps[$columnName] = null;
+				}
+			}
+		}
+
+		return $primaryDbProps;
 	}
 }

@@ -242,7 +242,7 @@ class AuthorGridHandler extends GridHandler {
 		$submission = $this->getSubmission();
 		$userRoles = $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
 
-		if (Services::get('publication')->isPublished($publication)) {
+		if ($publication->getData('status') === STATUS_PUBLISHED) {
 			return false;
 		}
 

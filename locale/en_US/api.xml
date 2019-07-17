@@ -17,8 +17,10 @@
 	<message key="api.404.resourceNotFound">The requested resource was not found.</message>
 	<message key="api.404.endpointNotFound">The requested URL was not recognized.</message>
 	<message key="api.emailTemplates.404.templateNotFound">The email template you requested was not found.</message>
+	<message key="api.publication.403.alreadyPublished">The publication you want to publish is already published.</message>
 	<message key="api.publication.403.alreadyUnpublished">The publication you want to unpublish is not published.</message>
 	<message key="api.publication.403.cantEditPublished">You can not edit this publication because it has already been published.</message>
+	<message key="api.publication.403.cantEditStatus">You can not modify the status directly through the API. Instead, use the /publish and /unpublish endpoints.</message>
 	<message key="api.publication.403.cantDeletePublished">You must unpublish this publication before you can delete it.</message>
 	<message key="api.stats.400.wrongDateFormat">The date must be in the format YYYY-MM-DD.</message>
 	<message key="api.stats.400.wrongDateRange">The start date can not be later than the end date.</message>
