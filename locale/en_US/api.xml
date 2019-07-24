@@ -41,4 +41,6 @@
 	<message key="api.temporaryFiles.400.fileSize">Files larger than {$maxSize} can not be uploaded.</message>
 	<message key="api.temporaryFiles.400.config">File could not be uploaded because of a server configuration error. Please contact the system administrator.</message>
 	<message key="api.themes.404.themeUnavailable">The active theme, {$themePluginPath}, is not enabled and may not be installed.</message>
+	<message key="api.vocabs.400.localeNotSupported">The {$locale} locale is not supported.</message>
+	<message key="api.vocabs.400.vocabNotSupported">The {$vocab} vocab is not supported.</message>
 </locale>

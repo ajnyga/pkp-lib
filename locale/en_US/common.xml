@@ -237,6 +237,7 @@
 	<message key="common.remote">Remote</message>
 	<message key="common.remoteURL">RemoteURL</message>
 	<message key="common.remove">Remove</message>
+	<message key="common.removeItem">Remove {$item}</message>
 	<message key="common.removeSelection">Remove Selection</message>
 	<message key="common.replaced">Replaced</message>
 	<message key="common.replaceFile">Replace file</message>
@@ -252,6 +253,7 @@
 	<message key="common.clearSearch">Clear search phrase</message>
 	<message key="common.second">Second(s)</message>
 	<message key="common.selectAll">Select All</message>
+	<message key="common.selectedPrefix">Selected:</message>
 	<message key="common.selectNone">Select None</message>
 	<message key="common.select">Select</message>
 	<message key="common.sendEmail">Send Email</message>

@@ -40,27 +40,29 @@ class SubmissionKeywordDAO extends ControlledVocabDAO {
 
 	/**
 	 * Get keywords for a submission.
-	 * @param $submissionId int
+	 * @param $publicationId int
 	 * @param $locales array
 	 * @return array
 	 */
-	function getKeywords($submissionId, $locales) {
+	function getKeywords($publicationId, $locales = []) {
+		$result = [];
 
-		$returner = array();
-		foreach ($locales as $locale) {
-			$returner[$locale] = array();
-			$keywords = $this->build($submissionId);
-			$submissionKeywordEntryDao = DAORegistry::getDAO('SubmissionKeywordEntryDAO');
-			$submissionKeywords = $submissionKeywordEntryDao->getByControlledVocabId($keywords->getId());
-
-			while ($keyword = $submissionKeywords->next()) {
-				$keyword = $keyword->getKeyword();
-				if (array_key_exists($locale, $keyword)) { // quiets PHP when there are no keywords for a given locale
-					$returner[$locale][] = $keyword[$locale];
+		$keywords = $this->build($publicationId);
+		$submissionKeywordEntryDao = DAORegistry::getDAO('SubmissionKeywordEntryDAO');
+		$submissionKeywords = $submissionKeywordEntryDao->getByControlledVocabId($keywords->getId());
+		while ($keywordEntry = $submissionKeywords->next()) {
+			$keyword = $keywordEntry->getKeyword();
+			foreach ($keyword as $locale => $value) {
+				if (empty($locales) || in_array($locale, $locales)) {
+					if (!array_key_exists($locale, $result)) {
+						$result[$locale] = [];
+					}
+					$result[$locale][] = $value;
 				}
 			}
 		}
-		return $returner;
+
+		return $result;
 	}
 
 	/**
@@ -81,31 +83,6 @@ class SubmissionKeywordDAO extends ControlledVocabDAO {
 
 		$result->Close();
 		return $keywords;
-	}
-
-	/**
-	 * Get an array of submissionIds that have a given keyword
-	 * @param $content string
-	 * @return array
-	 */
-	function getSubmissionIdsByKeyword($keyword) {
-		$result = $this->retrieve(
-			'SELECT assoc_id
-			 FROM controlled_vocabs cv
-			 LEFT JOIN controlled_vocab_entries cve ON cv.controlled_vocab_id = cve.controlled_vocab_id
-			 INNER JOIN controlled_vocab_entry_settings cves ON cve.controlled_vocab_entry_id = cves.controlled_vocab_entry_id
-			 WHERE cves.setting_name = ? AND cves.setting_value = ?',
-			array(CONTROLLED_VOCAB_SUBMISSION_KEYWORD, $keyword)
-		);
-
-		$returner = array();
-		while (!$result->EOF) {
-			$row = $result->GetRowAssoc(false);
-			$returner[] = $row['assoc_id'];
-			$result->MoveNext();
-		}
-		$result->Close();
-		return $returner;
 	}
 
 	/**

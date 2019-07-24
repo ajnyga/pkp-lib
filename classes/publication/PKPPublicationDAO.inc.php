@@ -45,7 +45,7 @@ class PKPPublicationDAO extends SchemaDAO {
 	];
 
 	/** @var array List of properties that are stored in the controlled_vocab tables. */
-	public $controlledVocabProps = ['disciplines', 'keywords', 'language', 'subject', 'supportingAgences'];
+	public $controlledVocabProps = ['disciplines', 'keywords', 'languages', 'subjects', 'supportingAgencies'];
 
 	/**
 	 * Create a new DataObject of the appropriate class
@@ -65,11 +65,17 @@ class PKPPublicationDAO extends SchemaDAO {
 		// Get authors
 		$publication->setData('authors', Services::get('author')->getMany(['publicationIds' => $publication->getId()]));
 
-		// Get controlled vocab metadata (eg - keywords, etc)
+		// Get controlled vocab metadata
 		$submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		$publication->setData('keywords', $submissionKeywordDao->getKeywords($publication->getId(), ['en_US', 'fr_CA']));
-
-		// ...todo: disciplines, language, subject, supportingAgencies
+		$publication->setData('keywords', $submissionKeywordDao->getKeywords($publication->getId()));
+		$submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
+		$publication->setData('subjects', $submissionSubjectDao->getSubjects($publication->getId()));
+		$submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
+		$publication->setData('disciplines', $submissionDisciplineDao->getDisciplines($publication->getId()));
+		$submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
+		$publication->setData('languages', $submissionLanguageDao->getLanguages($publication->getId()));
+		$submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
+		$publication->setData('supportingAgencies', $submissionAgencyDao->getAgencies($publication->getId()));
 
 		return $publication;
 	}
@@ -86,14 +92,25 @@ class PKPPublicationDAO extends SchemaDAO {
 
 		parent::insertObject($publication);
 
-		// Update the controlled vocabularly
+		// Add controlled vocabularly for which we have props
 		if (!empty($controlledVocabProps)) {
 			foreach ($controlledVocabProps as $prop => $value) {
 				switch ($prop) {
 					case 'keywords':
 						DAORegistry::getDAO('SubmissionKeywordDAO')->insertKeywords($value, $publication->getId());
 						break;
-					// ...todo: disciplines, language, subject, supportingAgencies
+					case 'subjects':
+						DAORegistry::getDAO('SubmissionSubjectDAO')->insertSubjects($value, $publication->getId());
+						break;
+					case 'disciplines':
+						DAORegistry::getDAO('SubmissionDisciplineDAO')->insertDisciplines($value, $publication->getId());
+						break;
+					case 'languages':
+						DAORegistry::getDAO('SubmissionLanguageDAO')->insertLanguages($value, $publication->getId());
+						break;
+					case 'supportingAgencies':
+						DAORegistry::getDAO('SubmissionAgencyDAO')->insertAgencies($value, $publication->getId());
+						break;
 				}
 			}
 		}
@@ -113,14 +130,25 @@ class PKPPublicationDAO extends SchemaDAO {
 
 		parent::updateObject($publication);
 
-		// Update the controlled vocabularly
+		// Update controlled vocabularly for which we have props
 		if (!empty($controlledVocabProps)) {
 			foreach ($controlledVocabProps as $prop => $value) {
 				switch ($prop) {
 					case 'keywords':
 						DAORegistry::getDAO('SubmissionKeywordDAO')->insertKeywords($value, $publication->getId());
 						break;
-					// ...todo: disciplines, language, subject, supportingAgencies
+					case 'subjects':
+						DAORegistry::getDAO('SubmissionSubjectDAO')->insertSubjects($value, $publication->getId());
+						break;
+					case 'disciplines':
+						DAORegistry::getDAO('SubmissionDisciplineDAO')->insertDisciplines($value, $publication->getId());
+						break;
+					case 'languages':
+						DAORegistry::getDAO('SubmissionLanguageDAO')->insertLanguages($value, $publication->getId());
+						break;
+					case 'supportingAgencies':
+						DAORegistry::getDAO('SubmissionAgencyDAO')->insertAgencies($value, $publication->getId());
+						break;
 				}
 			}
 		}
@@ -133,9 +161,11 @@ class PKPPublicationDAO extends SchemaDAO {
 		parent::deleteById($publicationId);
 
 		// Delete the controlled vocabulary
-		DAORegistry::getDAO('SubmissionKeywordDAO')->deleteByPublicationId($publicationId);
-
-		// ...todo: disciplines, language, subject, supportingAgencies
-		// ...todo: galleys, participants
+		// Insert an empty array will clear existing entries
+		DAORegistry::getDAO('SubmissionKeywordDAO')->insertKeywords([], $publicationId);
+		DAORegistry::getDAO('SubmissionSubjectDAO')->insertSubjects([], $publicationId);
+		DAORegistry::getDAO('SubmissionDisciplineDAO')->insertDisciplines([], $publicationId);
+		DAORegistry::getDAO('SubmissionLanguageDAO')->insertLanguages([], $publicationId);
+		DAORegistry::getDAO('SubmissionAgencyDAO')->insertAgencies([], $publicationId);
 	}
 }

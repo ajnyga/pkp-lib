@@ -118,17 +118,17 @@ class PKPSubmissionMetadataFormImplementation {
 			$locales = array_keys($this->_parentForm->supportedLocales);
 
 			// load the persisted metadata controlled vocabularies
-			// $submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
-			// $submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
-			// $submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
-			// $submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
-			// $submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
+			$submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
+			$submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
+			$submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
+			$submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
+			$submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
 
-			// $this->_parentForm->setData('subjects', $submissionSubjectDao->getSubjects($submission->getId(), $locales));
-			// $this->_parentForm->setData('keywords', $submissionKeywordDao->getKeywords($submission->getId(), $locales));
-			// $this->_parentForm->setData('disciplines', $submissionDisciplineDao->getDisciplines($submission->getId(), $locales));
-			// $this->_parentForm->setData('agencies', $submissionAgencyDao->getAgencies($submission->getId(), $locales));
-			// $this->_parentForm->setData('languages', $submissionLanguageDao->getLanguages($submission->getId(), $locales));
+			$this->_parentForm->setData('subjects', $submissionSubjectDao->getSubjects($publication->getId(), $locales));
+			$this->_parentForm->setData('keywords', $submissionKeywordDao->getKeywords($publication->getId(), $locales));
+			$this->_parentForm->setData('disciplines', $submissionDisciplineDao->getDisciplines($publication->getId(), $locales));
+			$this->_parentForm->setData('agencies', $submissionAgencyDao->getAgencies($publication->getId(), $locales));
+			$this->_parentForm->setData('languages', $submissionLanguageDao->getLanguages($publication->getId(), $locales));
 			$this->_parentForm->setData('abstractsRequired', $this->_getAbstractsRequired($submission));
 		}
 	}
@@ -200,52 +200,49 @@ class PKPSubmissionMetadataFormImplementation {
 		// Save the publication
 		$publication = Services::get('publication')->edit($publication, $params, $request);
 
-		// // get the supported locale keys
-		// $locales = array_keys($this->_parentForm->supportedLocales);
+		// get the supported locale keys
+		$locales = array_keys($this->_parentForm->supportedLocales);
 
-		// // persist the metadata/keyword fields.
-		// $submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		// $submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
-		// $submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
-		// $submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
-		// $submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
+		// persist the metadata/keyword fields.
+		$submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
+		$submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
+		$submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
+		$submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
+		$submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
 
-		// $keywords = array();
-		// $agencies = array();
-		// $disciplines = array();
-		// $languages = array();
-		// $subjects = array();
+		$keywords = array();
+		$agencies = array();
+		$disciplines = array();
+		$languages = array();
+		$subjects = array();
 
-		// $tagitKeywords = $this->_parentForm->getData('keywords');
+		$tagitKeywords = $this->_parentForm->getData('keywords');
 
-		// if (is_array($tagitKeywords)) {
-		// 	foreach ($locales as $locale) {
-		// 		$keywords[$locale] = array_key_exists($locale . '-keywords', $tagitKeywords) ? $tagitKeywords[$locale . '-keywords'] : array();
-		// 		$agencies[$locale] = array_key_exists($locale . '-agencies', $tagitKeywords) ? $tagitKeywords[$locale . '-agencies'] : array();
-		// 		$disciplines[$locale] = array_key_exists($locale . '-disciplines', $tagitKeywords) ? $tagitKeywords[$locale . '-disciplines'] : array();
-		// 		$languages[$locale] = array_key_exists($locale . '-languages', $tagitKeywords) ? $tagitKeywords[$locale . '-languages'] : array();
-		// 		$subjects[$locale] = array_key_exists($locale . '-subjects', $tagitKeywords) ?$tagitKeywords[$locale . '-subjects'] : array();
-		// 	}
-		// }
+		if (is_array($tagitKeywords)) {
+			foreach ($locales as $locale) {
+				$keywords[$locale] = array_key_exists($locale . '-keywords', $tagitKeywords) ? $tagitKeywords[$locale . '-keywords'] : array();
+				$agencies[$locale] = array_key_exists($locale . '-agencies', $tagitKeywords) ? $tagitKeywords[$locale . '-agencies'] : array();
+				$disciplines[$locale] = array_key_exists($locale . '-disciplines', $tagitKeywords) ? $tagitKeywords[$locale . '-disciplines'] : array();
+				$languages[$locale] = array_key_exists($locale . '-languages', $tagitKeywords) ? $tagitKeywords[$locale . '-languages'] : array();
+				$subjects[$locale] = array_key_exists($locale . '-subjects', $tagitKeywords) ?$tagitKeywords[$locale . '-subjects'] : array();
+			}
+		}
 
-		// // persist the controlled vocabs
-		// $submissionKeywordDao->insertKeywords($keywords, $submission->getId());
-		// $submissionAgencyDao->insertAgencies($agencies, $submission->getId());
-		// $submissionDisciplineDao->insertDisciplines($disciplines, $submission->getId());
-		// $submissionLanguageDao->insertLanguages($languages, $submission->getId());
-		// $submissionSubjectDao->insertSubjects($subjects, $submission->getId());
-
-		// // Resequence the authors (this ensures a primary contact).
-		// $authorDao->resequenceAuthors($submission->getId());
+		// persist the controlled vocabs
+		$submissionKeywordDao->insertKeywords($keywords, $submission->getCurrentPublication()->getId());
+		$submissionAgencyDao->insertAgencies($agencies, $submission->getCurrentPublication()->getId());
+		$submissionDisciplineDao->insertDisciplines($disciplines, $submission->getCurrentPublication()->getId());
+		$submissionLanguageDao->insertLanguages($languages, $submission->getCurrentPublication()->getId());
+		$submissionSubjectDao->insertSubjects($subjects, $submission->getCurrentPublication()->getId());
 
 		// Save the submission categories
-		// $submissionDao = Application::getSubmissionDAO();
-		// $submissionDao->removeCategories($submission->getId());
-		// if ($categories = $this->_parentForm->getData('categories')) {
-		// 	foreach ((array) $categories as $categoryId) {
-		// 		$submissionDao->addCategory($submission->getId(), (int) $categoryId);
-		// 	}
-		// }
+		$submissionDao = Application::getSubmissionDAO();
+		$submissionDao->removeCategories($submission->getId());
+		if ($categories = $this->_parentForm->getData('categories')) {
+			foreach ((array) $categories as $categoryId) {
+				$submissionDao->addCategory($submission->getId(), (int) $categoryId);
+			}
+		}
 
 		// Only log modifications on completed submissions
 		if ($submission->getSubmissionProgress() == 0) {

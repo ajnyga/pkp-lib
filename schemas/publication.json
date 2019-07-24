@@ -145,12 +145,16 @@
 				"type": "string"
 			}
 		},
-		"language": {
-			"type": "string",
+		"languages": {
+			"type": "array",
 			"description": "Optional metadata that identifies the submission's primary language.",
+			"multilingual": true,
 			"validation": [
 				"nullable"
-			]
+			],
+			"items": {
+				"type": "string"
+			}
 		},
 		"lastModified": {
 			"type": "string",

@@ -677,6 +677,7 @@
 	<message key="publication.event.versionScheduled">A new version was scheduled for publication.</message>
 	<message key="publication.event.versionUnpublished">A version was removed from publication.</message>
 	<message key="publication.invalidSubmission">The submission for this publication could not be found.</message>
+	<message key="publication.metadata.success">The metadata have been updated.</message>
 	<message key="publication.publicationLicense">Permissions &amp; Disclosure</message>
 	<message key="publication.publicationLicense.success">The copyright and license information have been updated.</message>
 	<message key="publication.publish">Publish</message>

@@ -416,6 +416,8 @@ abstract class PKPWorkflowHandler extends Handler {
 		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId());
 		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
 		$temporaryFileApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getPath(), 'temporaryFiles');
+		$vocabSuggestionUrlBase =$request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'vocabs', null, null, ['vocab' => '__vocab__']);
+
 
 		import('classes.file.PublicFileManager');
 		$publicFileManager = new PublicFileManager();
@@ -467,9 +469,10 @@ abstract class PKPWorkflowHandler extends Handler {
 			]
 		);
 
-		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
-		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
 		$journalEntryForm = new APP\components\forms\publication\JournalEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
+		$metadataForm = new PKP\components\forms\publication\PKPMetadataForm($latestPublicationApiUrl, $locales, $latestPublication, $vocabSuggestionUrlBase);
+		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
+		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
 
 		// Import constants
 		import('classes.article.Submission');
@@ -480,10 +483,11 @@ abstract class PKPWorkflowHandler extends Handler {
 			'STATUS_PUBLISHED',
 			'STATUS_DECLINED',
 			'STATUS_SCHEDULED',
-			'FORM_TITLE_ABSTRACT',
-			'FORM_PUBLICATION_LICENSE',
 			'FORM_JOURNAL_ENTRY',
+			'FORM_METADATA',
+			'FORM_PUBLICATION_LICENSE',
 			'FORM_PUBLISH',
+			'FORM_TITLE_ABSTRACT',
 		]);
 
 		$submissionProps = Services::get('submission')->getFullProperties(
@@ -496,18 +500,20 @@ abstract class PKPWorkflowHandler extends Handler {
 
 		$settingsData = [
 			'components' => [
-				FORM_TITLE_ABSTRACT => $titleAbstractForm->getConfig(),
-				FORM_PUBLICATION_LICENSE => $publicationLicenseForm->getConfig(),
 				FORM_JOURNAL_ENTRY => $journalEntryForm->getConfig(),
+				FORM_METADATA => $metadataForm->getConfig(),
+				FORM_PUBLICATION_LICENSE => $publicationLicenseForm->getConfig(),
+				FORM_TITLE_ABSTRACT => $titleAbstractForm->getConfig(),
 			],
 			'contributorsGridUrl' => $contributorsGridUrl,
 			'csrfToken' => $request->getSession()->getCSRFToken(),
 			'editorialHistoryUrl' => $editorialHistoryUrl,
 			'publicationFormIds' => [
-				FORM_TITLE_ABSTRACT,
-				FORM_PUBLICATION_LICENSE,
 				FORM_JOURNAL_ENTRY,
+				FORM_METADATA,
+				FORM_PUBLICATION_LICENSE,
 				FORM_PUBLISH,
+				FORM_TITLE_ABSTRACT,
 			],
 			'publishUrl' => $publishUrl,
 			'representationsGridUrl' => $this->_getRepresentationsGridUrl($request, $submission),

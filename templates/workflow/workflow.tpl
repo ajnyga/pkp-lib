@@ -152,7 +152,7 @@
 							</div>
 						</tab>
 						<tab id="metadata" label="{translate key="submission.informationCenter.metadata"}">
-							.
+							<pkp-form v-bind="components.{$smarty.const.FORM_METADATA}" @set="set" />
 						</tab>
 						<tab v-if="supportsReferences" id="citations" label="{translate key="submission.citations"}">
 							.
