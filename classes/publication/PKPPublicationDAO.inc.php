@@ -14,7 +14,7 @@
  * @brief Operations for retrieving and modifying publication objects.
  */
 import('lib.pkp.classes.db.SchemaDAO');
-import('lib.pkp.classes.publication.Publication');
+import('classes.publication.Publication');
 
 class PKPPublicationDAO extends SchemaDAO {
 	/** @copydoc SchemaDao::$schemaName */

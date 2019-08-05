@@ -14,7 +14,7 @@
  */
 
 import('lib.pkp.classes.submission.form.SubmissionSubmitForm');
-import('lib.pkp.classes.publication.Publication');
+import('classes.publication.Publication');
 
 class PKPSubmissionSubmitStep1Form extends SubmissionSubmitForm {
 	/** @var boolean Is there a privacy statement to be confirmed? */

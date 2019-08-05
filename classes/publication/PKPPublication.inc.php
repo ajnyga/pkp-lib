@@ -1,20 +1,20 @@
 <?php
 
 /**
- * @file classes/publication/Publication.inc.php
+ * @file classes/publication/PKPPublication.inc.php
  *
  * Copyright (c) 2016-2019 Simon Fraser University
  * Copyright (c) 2003-2019 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class Publication
+ * @class PKPPublication
  * @ingroup publication
  * @see PublicationDAO
  *
- * @brief Class for Publication.
+ * @brief Base class for Publication.
  */
 
-class Publication extends DataObject {
+class PKPPublication extends DataObject {
 
   /**
    * Get localized data for this object.
