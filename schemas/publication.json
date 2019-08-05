@@ -45,7 +45,6 @@
 		"citations": {
 			"type": "string",
 			"description": "Optiional metadata that contains a list of references for works cited in this submission.",
-			"multilingual": true,
 			"validation": [
 				"nullable"
 			]

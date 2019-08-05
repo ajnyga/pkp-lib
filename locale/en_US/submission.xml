@@ -164,7 +164,7 @@
 	<message key="submission.changeComments">Change to</message>
 	<message key="submission.changeFile">Change File</message>
 	<message key="submission.citations">References</message>
-	<message key="submission.citations.description">Enter each reference on a new line so that it can be extracted.</message>
+	<message key="submission.citations.description">Enter each reference on a new line so that they can be extracted and recorded separately.</message>
 	<message key="submission.parsedCitations">Extracted References</message>
 	<message key="submission.parsedCitations.DOI">DOI</message>
 	<message key="submission.parsedCitations.description">The following references have been extracted and will be linked to the submission metadata.</message>
@@ -666,6 +666,7 @@
 	<message key="catalog.category.subcategories">Subcategories</message>
 
 	<!-- Publication -->
+	<message key="publication.citations.success">The references have been updated.</message>
 	<message key="publication.contributors">Contributors</message>
 	<message key="publication.copyrightYearBasis.issueDescription">The copyright year will be set automatically when this is published in an issue.</message>
 	<message key="publication.createVersion">Create New Version</message>

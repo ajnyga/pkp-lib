@@ -155,7 +155,7 @@
 							<pkp-form v-bind="components.{$smarty.const.FORM_METADATA}" @set="set" />
 						</tab>
 						<tab v-if="supportsReferences" id="citations" label="{translate key="submission.citations"}">
-							.
+							<pkp-form v-bind="components.{$smarty.const.FORM_CITATIONS}" @set="set" />
 						</tab>
 						<tab id="identifiers" label="{translate key="submission.identifiers"}">
 							.

@@ -471,6 +471,7 @@ abstract class PKPWorkflowHandler extends Handler {
 
 		$journalEntryForm = new APP\components\forms\publication\JournalEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
 		$metadataForm = new PKP\components\forms\publication\PKPMetadataForm($latestPublicationApiUrl, $locales, $latestPublication, $vocabSuggestionUrlBase);
+		$citationsForm = new PKP\components\forms\publication\PKPCitationsForm($latestPublicationApiUrl, $locales, $latestPublication);
 		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
 		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
 
@@ -483,6 +484,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			'STATUS_PUBLISHED',
 			'STATUS_DECLINED',
 			'STATUS_SCHEDULED',
+			'FORM_CITATIONS',
 			'FORM_JOURNAL_ENTRY',
 			'FORM_METADATA',
 			'FORM_PUBLICATION_LICENSE',
@@ -500,6 +502,7 @@ abstract class PKPWorkflowHandler extends Handler {
 
 		$settingsData = [
 			'components' => [
+				FORM_CITATIONS => $citationsForm->getConfig(),
 				FORM_JOURNAL_ENTRY => $journalEntryForm->getConfig(),
 				FORM_METADATA => $metadataForm->getConfig(),
 				FORM_PUBLICATION_LICENSE => $publicationLicenseForm->getConfig(),
@@ -509,6 +512,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			'csrfToken' => $request->getSession()->getCSRFToken(),
 			'editorialHistoryUrl' => $editorialHistoryUrl,
 			'publicationFormIds' => [
+				FORM_CITATIONS,
 				FORM_JOURNAL_ENTRY,
 				FORM_METADATA,
 				FORM_PUBLICATION_LICENSE,
