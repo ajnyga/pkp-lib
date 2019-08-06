@@ -132,8 +132,6 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 		$submissionFileManager = new SubmissionFileManager($submission->getContextId(), $submission->getId());
 		$submissionFileManager->rmtree($submissionFileManager->getBasePath());
 
-		// $this->authorDao->deleteBySubmissionId($submissionId);
-
 		$reviewRoundDao = DAORegistry::getDAO('ReviewRoundDAO');
 		$reviewRoundDao->deleteBySubmissionId($submissionId);
 
@@ -169,37 +167,6 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 
 		$submissionEmailLogDao = DAORegistry::getDAO('SubmissionEmailLogDAO');
 		$submissionEmailLogDao->deleteByAssoc(ASSOC_TYPE_SUBMISSION, $submissionId);
-
-		// // Delete controlled vocab lists assigned to this submission
-		// $submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		// $submissionKeywordVocab = $submissionKeywordDao->getBySymbolic(CONTROLLED_VOCAB_SUBMISSION_KEYWORD, ASSOC_TYPE_SUBMISSION, $submissionId);
-		// if (isset($submissionKeywordVocab)) {
-		// 	$submissionKeywordDao->deleteObject($submissionKeywordVocab);
-		// }
-
-		// $submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
-		// $submissionDisciplineVocab = $submissionDisciplineDao->getBySymbolic(CONTROLLED_VOCAB_SUBMISSION_DISCIPLINE, ASSOC_TYPE_SUBMISSION, $submissionId);
-		// if (isset($submissionDisciplineVocab)) {
-		// 	$submissionDisciplineDao->deleteObject($submissionDisciplineVocab);
-		// }
-
-		// $submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
-		// $submissionAgencyVocab = $submissionAgencyDao->getBySymbolic(CONTROLLED_VOCAB_SUBMISSION_AGENCY, ASSOC_TYPE_SUBMISSION, $submissionId);
-		// if (isset($submissionAgencyVocab)) {
-		// 	$submissionAgencyDao->deleteObject($submissionAgencyVocab);
-		// }
-
-		// $submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
-		// $submissionLanguageVocab = $submissionLanguageDao->getBySymbolic(CONTROLLED_VOCAB_SUBMISSION_LANGUAGE, ASSOC_TYPE_SUBMISSION, $submissionId);
-		// if (isset($submissionLanguageVocab)) {
-		// 	$submissionLanguageDao->deleteObject($submissionLanguageVocab);
-		// }
-
-		// $submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
-		// $submissionSubjectVocab = $submissionSubjectDao->getBySymbolic(CONTROLLED_VOCAB_SUBMISSION_SUBJECT, ASSOC_TYPE_SUBMISSION, $submissionId);
-		// if (isset($submissionSubjectVocab)) {
-		// 	$submissionSubjectDao->deleteObject($submissionSubjectVocab);
-		// }
 	}
 
 	/**
