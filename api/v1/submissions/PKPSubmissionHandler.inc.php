@@ -184,6 +184,7 @@ class PKPSubmissionHandler extends APIHandler {
 			$propertyArgs = array(
 				'request' => $request,
 				'slimRequest' => $slimRequest,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray()
 			);
 			foreach ($submissions as $submission) {
 				$items[] = $submissionService->getSummaryProperties($submission, $propertyArgs);
@@ -213,7 +214,8 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$data = Services::get('submission')->getFullProperties($submission, array(
 			'request' => $request,
-			'slimRequest' 	=> $slimRequest
+			'slimRequest' 	=> $slimRequest,
+			'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
 		));
 
 		return $response->withJson($data, 200);
@@ -338,7 +340,8 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$data = Services::get('submission')->getFullProperties($submission, [
 			'request' => $request,
-			'slimRequest' 	=> $slimRequest
+			'slimRequest' 	=> $slimRequest,
+			'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
 		]);
 
 		return $response->withJson($data, 200);
@@ -387,7 +390,8 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$data = Services::get('submission')->getFullProperties($submission, [
 			'request' => $request,
-			'slimRequest' 	=> $slimRequest
+			'slimRequest' 	=> $slimRequest,
+			'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
 		]);
 
 		return $response->withJson($data, 200);
@@ -411,7 +415,8 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$submissionProps = Services::get('submission')->getFullProperties($submission, [
 			'request' => $request,
-			'slimRequest' 	=> $slimRequest
+			'slimRequest' 	=> $slimRequest,
+			'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
 		]);
 
 		Services::get('submission')->delete($submission);
@@ -477,9 +482,11 @@ class PKPSubmissionHandler extends APIHandler {
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$allowedParams = ['submissionIds' => $submission->getId(), 'count' => 1000];
 
+		$userGroups = DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray();
+
 		$items = array_map(
-			function($publication) use ($request) {
-				return Services::get('publication')->getSummaryProperties($publication, ['request' => $request]);
+			function($publication) use ($request, $userGroups) {
+				return Services::get('publication')->getSummaryProperties($publication, ['request' => $request, 'userGroups' => $userGroups]);
 			},
 			Services::get('publication')->getMany($allowedParams)
 		);
@@ -514,7 +521,13 @@ class PKPSubmissionHandler extends APIHandler {
 			return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
 		}
 
-		$data = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$data = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		return $response->withJson($data, 200);
 	}
@@ -553,7 +566,13 @@ class PKPSubmissionHandler extends APIHandler {
 		$publication = DAORegistry::getDAO('PublicationDAO')->newDataObject();
 		$publication->_data = $params;
 		$publication = Services::get('publication')->add($publication, $request);
-		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		return $response->withJson($publicationProps, 200);
 	}
@@ -581,7 +600,13 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$publication = Services::get('publication')->version($publication, $request);
 
-		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		return $response->withJson($publicationProps, 200);
 	}
@@ -636,7 +661,13 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$publication = Services::get('publication')->edit($publication, $params, $request);
 
-		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		return $response->withJson($publicationProps, 200);
 	}
@@ -692,7 +723,13 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$publication = Services::get('publication')->publish($publication);
 
-		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		return $response->withJson($publicationProps, 200);
 	}
@@ -724,7 +761,13 @@ class PKPSubmissionHandler extends APIHandler {
 
 		$publication = Services::get('publication')->unpublish($publication);
 
-		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		return $response->withJson($publicationProps, 200);
 	}
@@ -757,7 +800,13 @@ class PKPSubmissionHandler extends APIHandler {
 			return $response->withStatus(403)->withJsonError('api.publication.403.cantDeletePublished');
 		}
 
-		$publicationProps = Services::get('publication')->getFullProperties($publication, ['request' => $request]);
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => DAORegistry::getDAO('UserGroupDAO')->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
 
 		Services::get('publication')->delete($publication);
 
