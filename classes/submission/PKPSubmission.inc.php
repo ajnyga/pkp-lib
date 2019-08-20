@@ -45,6 +45,18 @@ abstract class PKPSubmission extends DataObject {
 	}
 
 	/**
+	 * Return the "best" article ID -- If a public article ID is set,
+	 * use it; otherwise use the internal article Id.
+	 * @return string
+	 * @deprecated 3.2.0.0
+	 */
+	function getBestId() {
+		$publicArticleId = $this->getStoredPubId('publisher-id');
+		if (!empty($publicArticleId)) return $publicArticleId;
+		return $this->getId();
+	}
+
+	/**
 	 * Get the current publication
 	 *
 	 * Uses the `currentPublicationId` to get the current
@@ -305,19 +317,6 @@ abstract class PKPSubmission extends DataObject {
 		if ($publication) {
 			$publication->setData('licenseURL', $licenseURL);
 		}
-	}
-
-	/**
-	 * Return option selection indicating if author should be hidden in issue ToC.
-	 * @return int AUTHOR_TOC_...
-	 * @deprecated 3.2.0.0
-	 */
-	function getHideAuthor() {
-		$publication = $this->getCurrentPublication();
-		if (!$publication) {
-			return 0;
-		}
-		return $publication->getData('hideAuthor');
 	}
 
 	/**

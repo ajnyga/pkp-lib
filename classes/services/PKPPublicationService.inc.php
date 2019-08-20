@@ -163,7 +163,7 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 						$submissionContext->getData('urlPath'),
 						'article',
 						'view',
-						[$submission->getBestArticleId(), 'version', $publication->getId()]
+						[$submission->getBestId(), 'version', $publication->getId()]
 					);
 					break;
 				default:
@@ -215,6 +215,7 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 	 * @copydoc \PKP\Services\EntityProperties\EntityWriteInterface::validate()
 	 */
 	public function validate($action, $props, $allowedLocales, $primaryLocale) {
+		\AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
 		$schemaService = Services::get('schema');
 
 		import('lib.pkp.classes.validation.ValidatorFactory');
@@ -347,13 +348,17 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 				$newAuthor = clone $author;
 				$newAuthor->setData('id', null);
 				$newAuthor->setData('publicationId', $newPublication->getId());
-				Services::get('author')->add($newAuthor, $request);
+				$newAuthor = Services::get('author')->add($newAuthor, $request);
+
+				if ($author->getId() === $publication->getData('primaryContactId')) {
+					$newPublication = $this->edit($newPublication, ['primaryContactId' => $newAuthor->getId()], $request);
+				}
 			}
 		}
 
 		$newPublication = $this->get($newPublication->getId());
 
-		\HookRegistry::call('Publication::version', [$newPublication, $publication, $request]);
+		\HookRegistry::call('Publication::version', [&$newPublication, $publication, $request]);
 
 		return $newPublication;
 	}
@@ -469,11 +474,6 @@ class PKPPublicationService implements EntityPropertyInterface, EntityReadInterf
 		\HookRegistry::call('Publication::delete::before', [$publication]);
 
 		DAORegistry::getDAO('PublicationDAO')->deleteObject($publication);
-
-		$contributors = Services::get('author')->getMany(['publicationIds' => $publication->getId()]);
-		foreach ($contributors as $contributor) {
-			Services::get('author')->delete($contributor);
-		}
 
 		// Update a submission's status based on the status of its remaining publications
 		$submission = Services::get('submission')->get($publication->getData('submissionId'));

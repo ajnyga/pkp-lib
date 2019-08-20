@@ -58,6 +58,70 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 	function submission($args, $request) {
 		// Pass the authorized submission on to the template.
 		$this->setupTemplate($request);
+
+		$templateMgr = TemplateManager::getManager($request);
+		return $templateMgr->display('authorDashboard/authorDashboard.tpl');
+	}
+
+
+	/**
+	 * Fetches information about a specific email and returns it.
+	 * @param $args array
+	 * @param $request Request
+	 * @return JSONMessage JSON object
+	 */
+	function readSubmissionEmail($args, $request) {
+		$submissionEmailLogDao = DAORegistry::getDAO('SubmissionEmailLogDAO');
+		$user = $request->getUser();
+		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+		$submissionEmailId = $request->getUserVar('submissionEmailId');
+
+		$submissionEmailFactory = $submissionEmailLogDao->getByEventType($submission->getId(), SUBMISSION_EMAIL_EDITOR_NOTIFY_AUTHOR, $user->getId());
+		while ($email = $submissionEmailFactory->next()) { // validate the email id for this user.
+			if ($email->getId() == $submissionEmailId) {
+				$templateMgr = TemplateManager::getManager($request);
+				$templateMgr->assign('submissionEmail', $email);
+				return $templateMgr->fetchJson('authorDashboard/submissionEmail.tpl');
+			}
+		}
+	}
+
+	/**
+	 * Get the SUBMISSION_FILE_... file stage based on the current
+	 * WORKFLOW_STAGE_... workflow stage.
+	 * @param $currentStage int WORKFLOW_STAGE_...
+	 * @return int SUBMISSION_FILE_...
+	 */
+	protected function _fileStageFromWorkflowStage($currentStage) {
+		switch ($currentStage) {
+			case WORKFLOW_STAGE_ID_SUBMISSION:
+				return SUBMISSION_FILE_SUBMISSION;
+			case WORKFLOW_STAGE_ID_EXTERNAL_REVIEW:
+				return SUBMISSION_FILE_REVIEW_REVISION;
+			case WORKFLOW_STAGE_ID_EDITING:
+				return SUBMISSION_FILE_FINAL;
+			default:
+				return null;
+		}
+	}
+
+
+	//
+	// Protected helper methods
+	//
+	/**
+	 * Setup common template variables.
+	 */
+	function setupTemplate($request) {
+		parent::setupTemplate($request);
+		AppLocale::requireComponents(
+			LOCALE_COMPONENT_PKP_SUBMISSION,
+			LOCALE_COMPONENT_APP_SUBMISSION,
+			LOCALE_COMPONENT_PKP_EDITOR,
+			LOCALE_COMPONENT_APP_EDITOR,
+			LOCALE_COMPONENT_PKP_GRID
+		);
+
 		$templateMgr = TemplateManager::getManager($request);
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$templateMgr->assign('submission', $submission);
@@ -165,68 +229,6 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 				'version' => __('semicolon', ['label' => __('admin.version')]),
 			],
 		]);
-
-		return $templateMgr->display('authorDashboard/authorDashboard.tpl');
-	}
-
-
-	/**
-	 * Fetches information about a specific email and returns it.
-	 * @param $args array
-	 * @param $request Request
-	 * @return JSONMessage JSON object
-	 */
-	function readSubmissionEmail($args, $request) {
-		$submissionEmailLogDao = DAORegistry::getDAO('SubmissionEmailLogDAO');
-		$user = $request->getUser();
-		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
-		$submissionEmailId = $request->getUserVar('submissionEmailId');
-
-		$submissionEmailFactory = $submissionEmailLogDao->getByEventType($submission->getId(), SUBMISSION_EMAIL_EDITOR_NOTIFY_AUTHOR, $user->getId());
-		while ($email = $submissionEmailFactory->next()) { // validate the email id for this user.
-			if ($email->getId() == $submissionEmailId) {
-				$templateMgr = TemplateManager::getManager($request);
-				$templateMgr->assign('submissionEmail', $email);
-				return $templateMgr->fetchJson('authorDashboard/submissionEmail.tpl');
-			}
-		}
-	}
-
-	/**
-	 * Get the SUBMISSION_FILE_... file stage based on the current
-	 * WORKFLOW_STAGE_... workflow stage.
-	 * @param $currentStage int WORKFLOW_STAGE_...
-	 * @return int SUBMISSION_FILE_...
-	 */
-	protected function _fileStageFromWorkflowStage($currentStage) {
-		switch ($currentStage) {
-			case WORKFLOW_STAGE_ID_SUBMISSION:
-				return SUBMISSION_FILE_SUBMISSION;
-			case WORKFLOW_STAGE_ID_EXTERNAL_REVIEW:
-				return SUBMISSION_FILE_REVIEW_REVISION;
-			case WORKFLOW_STAGE_ID_EDITING:
-				return SUBMISSION_FILE_FINAL;
-			default:
-				return null;
-		}
-	}
-
-
-	//
-	// Protected helper methods
-	//
-	/**
-	 * Setup common template variables.
-	 */
-	function setupTemplate($request) {
-		parent::setupTemplate($request);
-		AppLocale::requireComponents(
-			LOCALE_COMPONENT_PKP_SUBMISSION,
-			LOCALE_COMPONENT_APP_SUBMISSION,
-			LOCALE_COMPONENT_PKP_EDITOR,
-			LOCALE_COMPONENT_APP_EDITOR,
-			LOCALE_COMPONENT_PKP_GRID
-		);
 	}
 
 	/**

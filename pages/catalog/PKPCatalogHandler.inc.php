@@ -146,15 +146,15 @@ class PKPCatalogHandler extends Handler {
 	/**
 	 * Assign the pagination template variables
 	 * @param $request PKPRequest
-	 * @param $publishedMonographs array Monographs being shown
+	 * @param $submissions array Monographs being shown
 	 * @param $page int Page number being shown
 	 * @param $count int Max number of monographs being shown
 	 * @param $offset int Starting position of monographs
 	 * @param $total int Total number of monographs available
 	 */
-	protected function _setupPaginationTemplate($request, $publishedMonographs, $page, $count, $offset, $total) {
+	protected function _setupPaginationTemplate($request, $submissions, $page, $count, $offset, $total) {
 		$showingStart = $offset + 1;
-		$showingEnd = min($offset + $count, $offset + count($publishedMonographs));
+		$showingEnd = min($offset + $count, $offset + count($submissions));
 		$nextPage = $total > $showingEnd ? $page + 1 : null;
 		$prevPage = $showingStart > 1 ? $page - 1 : null;
 

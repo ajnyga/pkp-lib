@@ -136,10 +136,6 @@ abstract class PKPWorkflowTabHandler extends Handler {
 				$templateMgr = TemplateManager::getManager($request);
 				$notificationRequestOptions = $this->getProductionNotificationOptions($submission->getId());
 				$selectedStageId = $this->getAuthorizedContextObject(ASSOC_TYPE_WORKFLOW_STAGE);
-				$representationDao = Application::getRepresentationDAO();
-				$representations = $representationDao->getByPublicationId($submission->getCurrentPublication()->getId(), $submission->getData('contextId'));
-				$templateMgr->assign('representations', $representations->toAssociativeArray());
-
 				$templateMgr->assign('productionNotificationRequestOptions', $notificationRequestOptions);
 
 				return $templateMgr->fetchJson('controllers/tab/workflow/production.tpl');

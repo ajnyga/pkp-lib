@@ -380,11 +380,8 @@ abstract class PKPWorkflowHandler extends Handler {
 		parent::setupTemplate($request);
 		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_ADMIN, LOCALE_COMPONENT_APP_ADMIN, LOCALE_COMPONENT_PKP_MANAGER, LOCALE_COMPONENT_APP_MANAGER, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION, LOCALE_COMPONENT_APP_EDITOR, LOCALE_COMPONENT_PKP_GRID, LOCALE_COMPONENT_PKP_EDITOR);
 
-		$router = $request->getRouter();
-
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$stageId = $this->getAuthorizedContextObject(ASSOC_TYPE_WORKFLOW_STAGE);
-		$accessibleWorkflowStages = $this->getAuthorizedContextObject(ASSOC_TYPE_ACCESSIBLE_WORKFLOW_STAGES);
 
 		$submissionContext = $request->getContext();
 		if ($submission->getContextId() !== $submissionContext->getId()) {
@@ -415,13 +412,7 @@ abstract class PKPWorkflowHandler extends Handler {
 
 		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId());
 		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
-		$temporaryFileApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getPath(), 'temporaryFiles');
 		$vocabSuggestionUrlBase =$request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'vocabs', null, null, ['vocab' => '__vocab__']);
-
-
-		import('classes.file.PublicFileManager');
-		$publicFileManager = new PublicFileManager();
-		$baseUrl = $request->getBaseUrl() . '/' . $publicFileManager->getContextFilesPath($submissionContext->getId());
 
 		$contributorsGridUrl = $request->getDispatcher()->url(
 			$request,
@@ -469,14 +460,13 @@ abstract class PKPWorkflowHandler extends Handler {
 			]
 		);
 
-		$journalEntryForm = new APP\components\forms\publication\JournalEntryForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext, $baseUrl, $temporaryFileApiUrl);
 		$metadataForm = new PKP\components\forms\publication\PKPMetadataForm($latestPublicationApiUrl, $locales, $latestPublication, $vocabSuggestionUrlBase);
 		$citationsForm = new PKP\components\forms\publication\PKPCitationsForm($latestPublicationApiUrl, $locales, $latestPublication);
 		$publicationLicenseForm = new PKP\components\forms\publication\PKPPublicationLicenseForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionContext);
 		$titleAbstractForm = new PKP\components\forms\publication\PKPTitleAbstractForm($latestPublicationApiUrl, $locales, $latestPublication);
 
 		// Import constants
-		import('classes.article.Submission');
+		import('classes.submission.Submission');
 		import('classes.components.forms.publication.PublishForm');
 
 		$templateMgr->setConstants([
@@ -485,7 +475,6 @@ abstract class PKPWorkflowHandler extends Handler {
 			'STATUS_DECLINED',
 			'STATUS_SCHEDULED',
 			'FORM_CITATIONS',
-			'FORM_JOURNAL_ENTRY',
 			'FORM_METADATA',
 			'FORM_PUBLICATION_LICENSE',
 			'FORM_PUBLISH',
@@ -500,10 +489,9 @@ abstract class PKPWorkflowHandler extends Handler {
 			]
 		);
 
-		$settingsData = [
+		$workflowData = [
 			'components' => [
 				FORM_CITATIONS => $citationsForm->getConfig(),
-				FORM_JOURNAL_ENTRY => $journalEntryForm->getConfig(),
 				FORM_METADATA => $metadataForm->getConfig(),
 				FORM_PUBLICATION_LICENSE => $publicationLicenseForm->getConfig(),
 				FORM_TITLE_ABSTRACT => $titleAbstractForm->getConfig(),
@@ -513,7 +501,6 @@ abstract class PKPWorkflowHandler extends Handler {
 			'editorialHistoryUrl' => $editorialHistoryUrl,
 			'publicationFormIds' => [
 				FORM_CITATIONS,
-				FORM_JOURNAL_ENTRY,
 				FORM_METADATA,
 				FORM_PUBLICATION_LICENSE,
 				FORM_PUBLISH,
@@ -543,7 +530,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			],
 		];
 
-		$templateMgr->assign('workflowData', $settingsData);
+		$templateMgr->assign('workflowData', $workflowData);
 	}
 
 	//

@@ -262,18 +262,18 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 		}
 
 		$result = $this->retrieve(
-			'SELECT ss.submission_id
+			'SELECT s.submission_id
 				FROM publication_settings ps
 				INNER JOIN publications p ON p.publication_id = ps.publication_id
-				INNER JOIN submissions s ON p.submission_id = s.submission_id
+				INNER JOIN submissions s ON p.publication_id = s.current_publication_id
 				WHERE ps.setting_name = ? AND ps.setting_value = ?'
-				. $contextId ? ' AND s.context_id = ?' : '',
+				. ($contextId ? ' AND s.context_id = ?' : ''),
 			$params
 		);
 
 		$submissionId = $result->fields[0];
 
-		if ($submissionId) {
+		if (!$submissionId) {
 			return null;
 		}
 
@@ -351,21 +351,6 @@ abstract class PKPSubmissionDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	 */
 	function getDefaultSortOption() {
 		return $this->getSortOption(ORDERBY_DATE_PUBLISHED, SORT_DIRECTION_DESC);
-	}
-
-	/**
-	 * Map a column heading value to a database value for sorting
-	 * @param $sortBy string
-	 * @return string
-	 */
-	function getSortMapping($sortBy) {
-		switch ($sortBy) {
-			case ORDERBY_TITLE:
-				return 'st.setting_value';
-			case ORDERBY_DATE_PUBLISHED:
-				return 'ps.date_published';
-			default: return null;
-		}
 	}
 
 	/**

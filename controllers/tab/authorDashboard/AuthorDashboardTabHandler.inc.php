@@ -98,7 +98,6 @@ class AuthorDashboardTabHandler extends Handler {
 				$templateMgr->assign('copyeditingEmails', $submissionEmailLogDao->getByEventType($submission->getId(), SUBMISSION_EMAIL_COPYEDIT_NOTIFY_AUTHOR, $user->getId()));
 				return $templateMgr->fetchJson('controllers/tab/authorDashboard/editorial.tpl');
 			case WORKFLOW_STAGE_ID_PRODUCTION:
-				$representationDao = Application::getRepresentationDAO();
 				$templateMgr->assign(array(
 					'productionEmails' => $submissionEmailLogDao->getByEventType($submission->getId(), SUBMISSION_EMAIL_PROOFREAD_NOTIFY_AUTHOR, $user->getId()),
 				));

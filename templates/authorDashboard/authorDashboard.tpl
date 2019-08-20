@@ -90,7 +90,7 @@
 					</ul>
 				</div>
 			</tab>
-			<tab id="publication" label="{translate key="submission.issueEntry.publicationMetadata"}">
+			<tab id="publication" label="{translate key="submission.publication"}">
 				<div class="pkpPublication" ref="publication" aria-live="polite">
 					<pkp-header class="pkpPublication__header">
 						<span class="pkpPublication__status">
@@ -141,6 +141,11 @@
 								<spinner></spinner>
 							</div>
 						</tab>
+						<tab id="chapters" label="{translate key="submission.chapters"}">
+							<div id="chapters-grid" ref="chapters">
+								<spinner></spinner>
+							</div>
+						</tab>
 						<tab id="metadata" label="{translate key="submission.informationCenter.metadata"}">
 							.
 						</tab>
@@ -150,7 +155,7 @@
 						<tab id="identifiers" label="{translate key="submission.identifiers"}">
 							.
 						</tab>
-						<tab id="galleys" label="{translate key="submission.layout.galleys"}">
+						<tab id="publicationFormats" label="{translate key="submission.publicationFormats"}">
 							<div id="representations-grid" ref="representations">
 								<spinner></spinner>
 							</div>

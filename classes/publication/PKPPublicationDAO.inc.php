@@ -77,6 +77,14 @@ class PKPPublicationDAO extends SchemaDAO {
 		$submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
 		$publication->setData('supportingAgencies', $submissionAgencyDao->getAgencies($publication->getId()));
 
+		// Get categories
+		$publication->setData('categoryIds', array_map(
+			function($category) {
+				return (int) $category->getId();
+			},
+			DAORegistry::getDAO('CategoryDAO')->getByPublicationId($publication->getId())->toArray()
+		));
+
 		return $publication;
 	}
 
@@ -112,6 +120,13 @@ class PKPPublicationDAO extends SchemaDAO {
 						DAORegistry::getDAO('SubmissionAgencyDAO')->insertAgencies($value, $publication->getId());
 						break;
 				}
+			}
+		}
+
+		// Set categories
+		if (!empty($publication->getData('categoryIds'))) {
+			foreach ($publication->getData('categoryIds') as $categoryId) {
+				DAORegistry::getDAO('CategoryDAO')->insertPublicationAssignment($categoryId, $publication->getId());
 			}
 		}
 
@@ -152,6 +167,14 @@ class PKPPublicationDAO extends SchemaDAO {
 				}
 			}
 		}
+
+		// Set categories
+		DAORegistry::getDAO('CategoryDAO')->deletePublicationAssignments($publication->getId());
+		if (!empty($publication->getData('categoryIds'))) {
+			foreach ($publication->getData('categoryIds') as $categoryId) {
+				DAORegistry::getDAO('CategoryDAO')->insertPublicationAssignment($categoryId, $publication->getId());
+			}
+		}
 	}
 
 	/**
@@ -160,6 +183,12 @@ class PKPPublicationDAO extends SchemaDAO {
 	public function deleteById($publicationId) {
 		parent::deleteById($publicationId);
 
+		// Delete authors
+		$contributors = Services::get('author')->getMany(['publicationIds' => $publicationId]);
+		foreach ($contributors as $contributor) {
+			Services::get('author')->delete($contributor);
+		}
+
 		// Delete the controlled vocabulary
 		// Insert an empty array will clear existing entries
 		DAORegistry::getDAO('SubmissionKeywordDAO')->insertKeywords([], $publicationId);
@@ -167,5 +196,8 @@ class PKPPublicationDAO extends SchemaDAO {
 		DAORegistry::getDAO('SubmissionDisciplineDAO')->insertDisciplines([], $publicationId);
 		DAORegistry::getDAO('SubmissionLanguageDAO')->insertLanguages([], $publicationId);
 		DAORegistry::getDAO('SubmissionAgencyDAO')->insertAgencies([], $publicationId);
+
+		// Delete categories
+		DAORegistry::getDAO('CategoryDAO')->deletePublicationAssignments($publicationId);
 	}
 }

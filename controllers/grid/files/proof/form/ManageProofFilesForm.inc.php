@@ -58,7 +58,7 @@ class ManageProofFilesForm extends ManageSubmissionFilesForm {
 		$newSubmissionFile = parent::importFile($context, $submissionFile, $fileStage);
 
 		$representationDao = Application::getRepresentationDAO();
-		$representation = $representationDao->getById($this->_representationId, $this->getSubmissionId(), $context->getId());
+		$representation = $representationDao->getById($this->_representationId);
 
 		$newSubmissionFile->setAssocType(ASSOC_TYPE_REPRESENTATION);
 		$newSubmissionFile->setAssocId($representation->getId());

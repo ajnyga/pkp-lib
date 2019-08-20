@@ -69,22 +69,6 @@ class Representation extends DataObject {
 	}
 
 	/**
-	 * Set submission ID.
-	 * @param $submissionId int
-	 */
-	function setSubmissionId($submissionId) {
-		$this->setData('submissionId', $submissionId);
-	}
-
-	/**
-	 * Get submission id
-	 * @return int
-	 */
-	function getSubmissionId() {
-		return $this->getData('submissionId');
-	}
-
-	/**
 	 * Determines if a representation is approved or not.
 	 * @return boolean
 	 */
@@ -158,11 +142,12 @@ class Representation extends DataObject {
 	}
 
 	function getRepresentationFiles($fileStage = null) {
+		$publication = Services::get('publication')->get($this->getData('publicationId'));
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /** @var $submissionFileDao SubmissionFileDAO */
-		return $submissionFiles = $submissionFileDao->getLatestRevisionsByAssocId(
+		return $submissionFileDao->getLatestRevisionsByAssocId(
 			ASSOC_TYPE_REPRESENTATION,
 			$this->getId(),
-			$this->getSubmissionId(),
+			$publication->getData('submissionId'),
 			$fileStage,
 			null
 		);

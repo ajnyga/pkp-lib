@@ -290,16 +290,6 @@ class NativeXmlSubmissionFilter extends NativeImportFilter {
 	function getImportFilter($elementName) {
 		assert(false); // Subclasses should override
 	}
-
-	/**
-	 * Class-specific methods for published submissions.
-	 * @param Submission $submission
-	 * @param DOMElement $node
-	 * @return Submission
-	 */
-	function populatePublishedSubmission($submission, $node) {
-		assert(false); // Subclasses should override.
-	}
 }
 
 

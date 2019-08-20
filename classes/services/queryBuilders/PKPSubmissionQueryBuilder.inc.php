@@ -76,12 +76,16 @@ abstract class PKPSubmissionQueryBuilder extends BaseQueryBuilder {
 	 * @return \APP\Services\QueryBuilders\SubmissionQueryBuilder
 	 */
 	public function orderBy($column, $direction = 'DESC') {
+		// Bring in orderby constants
+		import('classes.submission.SubmissionDAO');
 		if ($column === 'lastModified') {
 			$this->orderColumn = 's.last_modified';
 		} elseif ($column === 'title') {
-			$this->orderColumn = Capsule::raw('COALESCE(publication_tl.setting_value, publication_tpl.setting_value)');
+			$this->orderColumn = Capsule::raw('COALESCE(publication_tlps.setting_value, publication_tlpsl.setting_value)');
 		} elseif ($column === 'seq') {
 			$this->orderColumn = 'publication_seq.setting_value';
+		} elseif ($column === ORDERBY_DATE_PUBLISHED) {
+			$this->orderColumn = 'po.date_published';
 		} else {
 			$this->orderColumn = 's.date_submitted';
 		}
@@ -215,27 +219,33 @@ abstract class PKPSubmissionQueryBuilder extends BaseQueryBuilder {
 		}
 
 		// order by title
-		if ($this->orderColumn === Capsule::raw('COALESCE(publication_tlp.setting_value, publication_tpl.setting_value)')) {
+		if (is_object($this->orderColumn) && $this->orderColumn->getValue() === 'COALESCE(publication_tlps.setting_value, publication_tlpsl.setting_value)') {
 			$locale = \AppLocale::getLocale();
-			$this->columns[] = Capsule::raw('COALESCE(publication_tlp.setting_value, publication_tpl.setting_value)');
+			$this->columns[] = Capsule::raw('COALESCE(publication_tlps.setting_value, publication_tlpsl.setting_value)');
 			$q->leftJoin('publications as publication_tlp', 's.submission_id', '=', 'publication_tlp.submission_id')
 				->leftJoin('publication_settings as publication_tlps', 'publication_tlp.publication_id', '=', 'publication_tlps.publication_id')
-				->where('publication_tlp.setting_name', '=', 'title')
-				->where('publication_tlp.locale', '=', $locale);
+				->where('publication_tlps.setting_name', '=', 'title')
+				->where('publication_tlps.locale', '=', $locale);
 			$q->leftJoin('publications as publication_tlpl', 's.submission_id', '=', 'publication_tlpl.submission_id')
 				->leftJoin('publication_settings as publication_tlpsl', 'publication_tlp.publication_id', '=', 'publication_tlpsl.publication_id')
 				->where('publication_tlpsl.setting_name', '=', 'title')
-				->where('publication_tlpsl.locale', '=', Capsule::raw('s.locale'));
+				->where('publication_tlpsl.locale', '=', Capsule::raw('publication_tlpl.locale'));
 			$q->groupBy(Capsule::raw('COALESCE(publication_tlps.setting_value, publication_tlpsl.setting_value)'));
 		}
 
 		// order by publication sequence
-		if ($this->orderColumn === $this->orderColumn = 'publication_seq.setting_value') {
+		if ($this->orderColumn === 'publication_seq.setting_value') {
 			$this->columns[] = 'publication_seq.setting_value';
 			$q->leftJoin('publications as publication_seqp', 's.submission_id', '=', 'publication_seqp.submission_id')
 				->leftJoin('publication_settings as publication_seqps', 'publication_seqp.publication_id', '=', 'publication_seqps.publication_id')
 				->where('publication_seqps.setting_name', '=', 'seq');
 			$q->groupBy('publication_seq.setting_value');
+		}
+
+		// order by date of current version's publication
+		if ($this->orderColumn === 'po.date_published') {
+			$this->columns[] = 'po.date_published';
+			$q->leftJoin('publications as po', 's.current_publication_id', '=', 'po.publication_id');
 		}
 
 		// statuses

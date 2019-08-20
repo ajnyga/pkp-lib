@@ -73,7 +73,7 @@ class PKPPublicIdentifiersForm extends Form {
 			'stageId' => $this->getStageId(),
 			'formParams' => $this->getFormParams(),
 		));
-		if (is_a($this->getPubObject(), 'Representation')) {
+		if (is_a($this->getPubObject(), 'Representation') || is_a($this->getPubObject(), 'Chapter')) {
 			$publicationId = $this->getPubObject()->getData('publicationId');
 			$publication = Services::get('publication')->get($publicationId);
 			$templateMgr->assign([

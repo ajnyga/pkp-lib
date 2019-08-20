@@ -4,7 +4,7 @@
 	"type": "object",
 	"required": [
 		"locale",
-    "submissionId",
+		"submissionId",
 		"title"
 	],
 	"properties": {
@@ -42,21 +42,28 @@
 			"apiSummary": true,
 			"readOnly": true
 		},
+		"categoryIds": {
+			"type": "array",
+			"apiSummary": true,
+			"items": {
+				"type": "integer"
+			}
+		},
 		"citations": {
 			"type": "string",
 			"description": "Optiional metadata that contains a list of references for works cited in this submission.",
 			"validation": [
 				"nullable"
 			]
-    },
+		},
 		"copyrightHolder": {
 			"type": "string",
 			"description": "The copyright statement for this publication.",
-      "multilingual": true,
+			"multilingual": true,
 			"validation": [
 				"nullable"
 			]
-    },
+		},
 		"copyrightYear": {
 			"type": "integer",
 			"description": "The copyright year for this publication.",
@@ -107,10 +114,11 @@
 		"datePublished": {
 			"type": "string",
 			"apiSummary": true,
-      "validation": [
-        "date_format:Y-m-d H:i:s"
-      ]
-    },
+			"validation": [
+				"nullable",
+				"date_format:Y-m-d H:i:s"
+			]
+		},
 		"disciplines": {
 			"type": "array",
 			"description": "Optional metadata that describes the submission's types of study or branches of knowledge.",
@@ -157,10 +165,10 @@
 		},
 		"lastModified": {
 			"type": "string",
-      "validation": [
-        "date_format:Y-m-d H:i:s"
-      ]
-    },
+			"validation": [
+				"date_format:Y-m-d H:i:s"
+			]
+		},
 		"licenseUrl": {
 			"type": "string",
 			"description": "A URL to a webpage describing the license terms for this publication."
@@ -181,7 +189,7 @@
 			"validation": [
 				"nullable"
 			]
-    },
+		},
 		"primaryContactId": {
 			"type": "integer",
 			"description": "Which `contributor` is the primary contact for this publication.",
@@ -252,7 +260,7 @@
 			"validation": [
 				"nullable"
 			]
-    },
+		},
 		"supportingAgencies": {
 			"type": "array",
 			"description": "Optional metadata that indicates the source of research funding or other institutional support.",
@@ -292,5 +300,5 @@
 			"apiSummary": true,
 			"readOnly": true
 		}
-  }
+	}
 }

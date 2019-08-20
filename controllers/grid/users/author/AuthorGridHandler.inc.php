@@ -296,7 +296,7 @@ class AuthorGridHandler extends GridHandler {
 		$author = DAORegistry::getDAO('AuthorDAO')->getById($authorId);
 
 		// Form handling
-		import('lib.pkp.controllers.grid.users.author.form.AuthorForm');
+		import('controllers.grid.users.author.form.AuthorForm');
 		$authorForm = new AuthorForm($this->getPublication(), $author);
 		$authorForm->initData();
 
@@ -317,7 +317,7 @@ class AuthorGridHandler extends GridHandler {
 		$author = Services::get('author')->get($authorId);
 
 		// Form handling
-		import('lib.pkp.controllers.grid.users.author.form.AuthorForm');
+		import('controllers.grid.users.author.form.AuthorForm');
 		$authorForm = new AuthorForm($publication, $author);
 		$authorForm->readInputData();
 		if ($authorForm->validate()) {

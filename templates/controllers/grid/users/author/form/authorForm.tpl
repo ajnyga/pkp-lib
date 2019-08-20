@@ -48,6 +48,7 @@
 		{fbvFormSection list="true"}
 			{fbvElement type="checkbox" label="submission.submit.selectPrincipalContact" id="primaryContact" checked=$primaryContact}
 			{fbvElement type="checkbox" label="submission.submit.includeInBrowse" id="includeInBrowse" checked=$includeInBrowse}
+			{$additionalCheckboxes}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

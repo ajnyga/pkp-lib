@@ -666,10 +666,12 @@
 	<message key="catalog.category.subcategories">Subcategories</message>
 
 	<!-- Publication -->
+	<message key="submission.publication">Publication</message>
 	<message key="publication.citations.success">The references have been updated.</message>
 	<message key="publication.contributors">Contributors</message>
 	<message key="publication.copyrightYearBasis.issueDescription">The copyright year will be set automatically when this is published in an issue.</message>
 	<message key="publication.createVersion">Create New Version</message>
+	<message key="publication.datePublished">Date Published</message>
 	<message key="publication.editDisabled">This version has been published and can not be edited.</message>
 	<message key="publication.event.published">The submission was published.</message>
 	<message key="publication.event.scheduled">The submission was scheduled for publication.</message>
