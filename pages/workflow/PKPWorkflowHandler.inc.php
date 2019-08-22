@@ -410,9 +410,9 @@ abstract class PKPWorkflowHandler extends Handler {
 
 		$latestPublication = $submission->getLatestPublication();
 
-		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId());
-		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
-		$vocabSuggestionUrlBase =$request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'vocabs', null, null, ['vocab' => '__vocab__']);
+		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getData('urlPath'), 'submissions/' . $submission->getId());
+		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getData('urlPath'), 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
+		$vocabSuggestionUrlBase =$request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getData('urlPath'), 'vocabs', null, null, ['vocab' => '__vocab__']);
 
 		$contributorsGridUrl = $request->getDispatcher()->url(
 			$request,
@@ -420,7 +420,7 @@ abstract class PKPWorkflowHandler extends Handler {
 			null,
 			'grid.users.author.AuthorGridHandler',
 			'fetchGrid',
-			$submission->getId(),
+			null,
 			[
 				'submissionId' => $submission->getId(),
 				'publicationId' => '__publicationId__',

@@ -75,7 +75,7 @@ class PKPPublication extends DataObject {
    * @return array
    */
   public function getFullTitles() {
-    $allTitles = $this->getData('title');
+    $allTitles = (array) $this->getData('title');
     $return = [];
     foreach ($allTitles as $locale => $title) {
       if (!$title) {

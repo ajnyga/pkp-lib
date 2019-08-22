@@ -172,7 +172,7 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 			}
 		}
 
-		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext, 'submissions/' . $submission->getId());
+		$submissionApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $submissionContext->getData('urlPath'), 'submissions/' . $submission->getId());
 
 		$contributorsGridUrl = $request->getDispatcher()->url(
 			$request,
