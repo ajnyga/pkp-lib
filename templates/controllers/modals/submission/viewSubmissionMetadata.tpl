@@ -12,10 +12,10 @@
 	<h3>{$publication->getLocalizedFullTitle()|strip_unsafe_html}</h3>
 	{if $authors}<h4>{$authors|escape}</h4>{/if}
 	<div class="abstract">
-
+		{$publication->getLocalizedData('abstract')|strip_unsafe_html}
 	</div>
 	{if $additionalMetadata}
-		<table>
+		<table class="pkpTable">
 		{foreach $additionalMetadata as $metadata}
 			<tr>
 				{foreach $metadata as $metadataItem}

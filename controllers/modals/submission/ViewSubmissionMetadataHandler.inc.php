@@ -45,27 +45,26 @@ class ViewSubmissionMetadataHandler extends handler {
 		$publication = $submission->getCurrentPublication();
 
 		if ($reviewAssignment->getReviewMethod() != SUBMISSION_REVIEW_METHOD_DOUBLEBLIND) { /* SUBMISSION_REVIEW_METHOD_BLIND or _OPEN */
-			$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
-			$userGroups = $userGroupDao->getByContextId($context->getId());
+			$userGroups = DAORegistry::getDAO('UserGroupDAO')->getByContextId($context->getId())->toArray();
 			$templateMgr->assign('authors', $publication->getAuthorString($userGroups));
 		}
 
 		$templateMgr->assign('publication', $publication);
 
-		if ($publication->getData('keywords')) {
-			$additionalMetadata[] = array(__('common.keywords'), implode(', ', $publication->getData('keywords')[AppLocale::getLocale()]));
+		if ($publication->getLocalizedData('keywords')) {
+			$additionalMetadata[] = array(__('common.keywords'), implode(', ', $publication->getLocalizedData('keywords')));
 		}
-		if ($publication->getData('subjects')) {
-			$additionalMetadata[] = array(__('common.subjects'), implode(', ', $publication->getData('subjects')[AppLocale::getLocale()]));			
+		if ($publication->getLocalizedData('subjects')) {
+			$additionalMetadata[] = array(__('common.subjects'), implode(', ', $publication->getLocalizedData('subjects')));			
 		}
-		if ($publication->getData('disciplines')) {
-			$additionalMetadata[] = array(__('common.discipline'), implode(', ', $publication->getData('disciplines')[AppLocale::getLocale()]));
+		if ($publication->getLocalizedData('disciplines')) {
+			$additionalMetadata[] = array(__('common.discipline'), implode(', ', $publication->getLocalizedData('disciplines')));
 		}
-		if ($publication->getData('agencies')) {
-			$additionalMetadata[] = array(__('submission.agencies'), implode(', ', $publication->getData('agencies')[AppLocale::getLocale()]));
+		if ($publication->getLocalizedData('agencies')) {
+			$additionalMetadata[] = array(__('submission.agencies'), implode(', ', $publication->getLocalizedData('agencies')));
 		}
-		if ($publication->getData('languages')) {
-			$additionalMetadata[] = array(__('common.languages'), implode(', ', $publication->getData('languages')[AppLocale::getLocale()]));
+		if ($publication->getLocalizedData('languages')) {
+			$additionalMetadata[] = array(__('common.languages'), implode(', ', $publication->getLocalizedData('languages')));
 		}		
 
 		$templateMgr->assign('additionalMetadata', $additionalMetadata);
