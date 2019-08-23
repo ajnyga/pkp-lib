@@ -9,17 +9,21 @@
  *}
 
 <div id="viewSubmissionMetadata" class="">
-	<h3>{$title|escape}</h3>
+	<h3>{$publication->getLocalizedFullTitle()|strip_unsafe_html}</h3>
 	{if $authors}<h4>{$authors|escape}</h4>{/if}
 	<div class="abstract">
-		{$abstract}
+
 	</div>
 	{if $additionalMetadata}
 		<table>
 		{foreach $additionalMetadata as $metadata}
 			<tr>
 				{foreach $metadata as $metadataItem}
-					<td>{$metadataItem}</td>
+					{if $metadataItem@iteration % 2 != 0}
+						<th scope="row">{$metadataItem}</th>
+					{else}
+						<td>{$metadataItem}</td>
+					{/if}
 				{/foreach}
 			</tr>
 		{/foreach}

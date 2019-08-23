@@ -40,43 +40,32 @@ class ViewSubmissionMetadataHandler extends handler {
 	function display($args, $request) {
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$reviewAssignment = $this->getAuthorizedContextObject(ASSOC_TYPE_REVIEW_ASSIGNMENT);
+		$context = $request->getContext();
 		$templateMgr = TemplateManager::getManager($request);
+		$publication = $submission->getCurrentPublication();
 
 		if ($reviewAssignment->getReviewMethod() != SUBMISSION_REVIEW_METHOD_DOUBLEBLIND) { /* SUBMISSION_REVIEW_METHOD_BLIND or _OPEN */
-			$templateMgr->assign('authors', $submission->getAuthorString());
+			$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+			$userGroups = $userGroupDao->getByContextId($context->getId());
+			$templateMgr->assign('authors', $publication->getAuthorString($userGroups));
 		}
 
-		$templateMgr->assign(array(
-			'title' => $submission->getLocalizedFullTitle(),
-			'abstract' => $submission->getLocalizedAbstract(),
-		));
+		$templateMgr->assign('publication', $publication);
 
-		$publication = $submission->getCurrentPublication();
-		$submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		$submissionSubjectDao = DAORegistry::getDAO('SubmissionSubjectDAO');
-		$submissionDisciplineDao = DAORegistry::getDAO('SubmissionDisciplineDAO');
-		$submissionAgencyDao = DAORegistry::getDAO('SubmissionAgencyDAO');
-		$submissionLanguageDao = DAORegistry::getDAO('SubmissionLanguageDAO');
-
-		$keywords = $submissionKeywordDao->getKeywords($publication->getId(), array(AppLocale::getLocale()));
-		if ($keywords) {
-			$additionalMetadata[] = array('Keywords', implode(', ', $keywords[AppLocale::getLocale()]));
+		if ($publication->getData('keywords')) {
+			$additionalMetadata[] = array(__('common.keywords'), implode(', ', $publication->getData('keywords')[AppLocale::getLocale()]));
 		}
-		$subjects = $submissionSubjectDao->getSubjects($publication->getId(), array(AppLocale::getLocale()));
-		if ($subjects) {
-			$additionalMetadata[] = array('Subjects', implode(', ', $subjects[AppLocale::getLocale()]));
+		if ($publication->getData('subjects')) {
+			$additionalMetadata[] = array(__('common.subjects'), implode(', ', $publication->getData('subjects')[AppLocale::getLocale()]));			
 		}
-		$disciplines = $submissionDisciplineDao->getDisciplines($publication->getId(), array(AppLocale::getLocale()));
-		if ($disciplines) {
-			$additionalMetadata[] = array('Disciplines', implode(', ', $disciplines[AppLocale::getLocale()]));
+		if ($publication->getData('disciplines')) {
+			$additionalMetadata[] = array(__('common.discipline'), implode(', ', $publication->getData('disciplines')[AppLocale::getLocale()]));
 		}
-		$agencies = $submissionAgencyDao->getAgencies($publication->getId(), array(AppLocale::getLocale()));
-		if ($agencies) {
-			$additionalMetadata[] = array('Supporting Agencies', implode(', ', $agencies[AppLocale::getLocale()]));
+		if ($publication->getData('agencies')) {
+			$additionalMetadata[] = array(__('submission.agencies'), implode(', ', $publication->getData('agencies')[AppLocale::getLocale()]));
 		}
-		$languages = $submissionLanguageDao->getLanguages($publication->getId(), array(AppLocale::getLocale()));
-		if ($languages) {
-			$additionalMetadata[] = array('Languages', implode(', ', $languages[AppLocale::getLocale()]));
+		if ($publication->getData('languages')) {
+			$additionalMetadata[] = array(__('common.languages'), implode(', ', $publication->getData('languages')[AppLocale::getLocale()]));
 		}		
 
 		$templateMgr->assign('additionalMetadata', $additionalMetadata);
