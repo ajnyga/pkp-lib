@@ -206,6 +206,30 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 			]
 		);
 
+		// Get full details of the working publication and the currently published publication
+		$workingPublicationProps = Services::get('publication')->getFullProperties(
+			$submission->getLatestPublication(),
+			[
+				'context' => $submissionContext,
+				'submission' => $submission,
+				'request' => $request,
+				'userGroups' => $contextUserGroups,
+			]
+		);
+		if ($submission->getLatestPublication()->getId() === $submission->getCurrentPublication()->getId()) {
+			$currentPublicationProps = $workingPublicationProps;
+		} else {
+			$currentPublicationProps = Services::get('publication')->getFullProperties(
+				$submission->getCurrentPublication(),
+				[
+					'context' => $submissionContext,
+					'submission' => $submission,
+					'request' => $request,
+					'userGroups' => $contextUserGroups,
+				]
+			);
+		}
+
 		$templateMgr->assign('workflowData', [
 			'components' => [
 
@@ -221,6 +245,8 @@ abstract class PKPAuthorDashboardHandler extends Handler {
 			'submissionLibraryUrl' => $submissionLibraryUrl,
 			'supportsReferences' => !!$submissionContext->getData('citations'),
 			'uploadFileUrl' => $uploadFileUrl,
+			'currentPublication' => $currentPublicationProps,
+			'workingPublication' => $workingPublicationProps,
 			'i18n' => [
 				'publicationTabsLabel' => __('publication.version.details'),
 				'status' => __('semicolon', ['label' => __('common.status')]),
