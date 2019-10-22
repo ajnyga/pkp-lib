@@ -41,6 +41,9 @@ msgstr "You can not modify the status directly through the API. Instead, use the
 msgid "api.publication.403.cantDeletePublished"
 msgstr "You must unpublish this publication before you can delete it."
 
+msgid "api.submissions.403.userCantEdit"
+msgstr "You are not allowed to edit this publication."
+
 msgid "api.stats.400.wrongDateFormat"
 msgstr "The date must be in the format YYYY-MM-DD."
 
