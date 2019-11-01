@@ -687,9 +687,9 @@ abstract class PKPSubmissionService implements EntityPropertyInterface, EntityRe
 	 * @copydoc \PKP\Services\EntityProperties\EntityWriteInterface::add()
 	 */
 	public function add($submission, $request) {
-		$submission->setData('dateStatusModified', Core::getCurrentDate());
-		$submission->setData('lastModified', Core::getCurrentDate());
-		if (!$submission->getData('dateSubmitted')) {
+		$submission->stampLastActivity();
+		$submission->stampModified();
+		if (!$submission->getData('dateSubmitted') && !$submission->getData('submissionProgress')) {
 			$submission->setData('dateSubmitted', Core::getCurrentDate());
 		}
 		$submissionId = Application::get()->getSubmissionDAO()->insertObject($submission);
@@ -774,7 +774,7 @@ abstract class PKPSubmissionService implements EntityPropertyInterface, EntityRe
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 		$allowedRoles = $userGroupDao->getNotChangeMetadataEditPermissionRoles();
 		foreach ($roles as $role) {
-			if (in_array($role->getRoleId(), $allowedRoles)) 
+			if (in_array($role->getRoleId(), $allowedRoles))
 				return true;
 		}
 		return false;
