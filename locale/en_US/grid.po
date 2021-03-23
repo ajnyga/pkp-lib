@@ -53,6 +53,9 @@ msgstr "Update discussion"
 msgid "grid.action.addUser"
 msgstr "Add User"
 
+msgid "grid.action.inviteUser"
+msgstr "Invite User"
+
 msgid "grid.action.unassignReviewer"
 msgstr "Unassign this reviewer"
 
@@ -478,6 +481,9 @@ msgstr "All Permission Levels"
 
 msgid "grid.user.add"
 msgstr "Add User"
+
+msgid "grid.user.invite"
+msgstr "Invite User"
 
 msgid "grid.user.enroll"
 msgstr "Enroll User"

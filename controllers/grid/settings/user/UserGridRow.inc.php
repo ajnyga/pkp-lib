@@ -110,6 +110,18 @@ class UserGridRow extends GridRow {
 						__('grid.user.edit'),
 						'edit')
 				);
+				$this->addAction(
+					new LinkAction(
+						'inviteUser',
+						new AjaxModal(
+							$router->url($request, null, null, 'inviteUser', null, $actionArgs),
+							__('grid.user.invite'),
+							'modal_invite_user',
+							true
+							),
+						__('grid.user.invite'),
+						'invite_user')
+				);
 				if ($element->getDisabled()) {
 					$actionArgs['enable'] = true;
 					$this->addAction(

@@ -18,6 +18,7 @@ import('lib.pkp.classes.controllers.grid.DataObjectGridCellProvider');
 
 import('lib.pkp.controllers.grid.settings.user.UserGridRow');
 import('lib.pkp.controllers.grid.settings.user.form.UserDetailsForm');
+import('lib.pkp.controllers.grid.settings.user.form.InviteUserForm');
 
 class UserGridHandler extends GridHandler {
 	/** integer user id for the user to remove */
@@ -31,8 +32,8 @@ class UserGridHandler extends GridHandler {
 		$this->addRoleAssignment(array(
 			ROLE_ID_MANAGER, ROLE_ID_SITE_ADMIN),
 			array('fetchGrid', 'fetchRow', 'editUser', 'updateUser', 'updateUserRoles',
-				'editDisableUser', 'disableUser', 'removeUser', 'addUser',
-				'editEmail', 'sendEmail', 'mergeUsers')
+				'editDisableUser', 'disableUser', 'removeUser', 'addUser', 
+				'inviteUser', 'sendInvite', 'editEmail', 'sendEmail', 'mergeUsers')
 		);
 	}
 
@@ -81,6 +82,19 @@ class UserGridHandler extends GridHandler {
 					),
 				__('grid.user.add'),
 				'add_user')
+		);
+
+		$this->addAction(
+			new LinkAction(
+				'inviteUser',
+				new AjaxModal(
+					$router->url($request, null, null, 'inviteUser', null, null),
+					__('grid.action.inviteUser'),
+					'modal_invite_user',
+					true
+					),
+				__('grid.action.inviteUser'),
+				'invite_user')
 		);
 
 		//
@@ -254,6 +268,50 @@ class UserGridHandler extends GridHandler {
 	//
 	// Public grid actions.
 	//
+
+	/**
+	 * Invite an user to role(s).
+	 * @param $args array
+	 * @param $request PKPRequest
+	 */
+	function inviteUser($args, $request) {
+		// Identify the user Id.
+		$userId = $request->getUserVar('rowId');
+		if (!$userId) $userId = $request->getUserVar('userId');
+
+		// Form handling.
+		$userForm = new InviteUserForm($request, $userId);
+		$userForm->initData();
+
+		return new JSONMessage(true, $userForm->display($request));
+	}
+
+	/**
+	 * Send invitation to role(s).
+	 * @param $args array
+	 * @param $request PKPRequest
+	 * @return JSONMessage JSON object
+	 */
+	function sendInvite($args, $request) {
+		$currentUser = $request->getUser();
+
+		// Identify the user Id.
+		$userId = $request->getUserVar('userId');
+
+		// Form handling.
+		$inviteForm = new InviteUserForm($request, $userId);
+		$inviteForm->readInputData();
+
+		if ($inviteForm->validate()) {
+			$inviteForm->execute();
+			$notificationManager = new NotificationManager();
+			$notificationManager->createTrivialNotification($currentUser->getId(), NOTIFICATION_TYPE_SUCCESS, ['contents' => __('notification.invitedUser')]);
+			return DAO::getDataChangedEvent($userId);
+		} else {
+			return new JSONMessage(false);
+		}
+	}
+
 	/**
 	 * Add a new user.
 	 * @param $args array
