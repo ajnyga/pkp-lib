@@ -103,7 +103,7 @@ class StageRolePolicy extends AuthorizationPolicy
             while ($stageAssignment = $result->next()) {
                 $noResults = false;
                 $userGroup = $userGroupDao->getById($stageAssignment->getUserGroupId());
-                if ($userGroup->getRoleId() == Role::ROLE_ID_MANAGER && !$stageAssignment->getRecommendOnly()) {
+                if (in_array($userGroup->getRoleId(), [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR]) && !$stageAssignment->getRecommendOnly()) {
                     return AuthorizationPolicy::AUTHORIZATION_PERMIT;
                 }
             }
