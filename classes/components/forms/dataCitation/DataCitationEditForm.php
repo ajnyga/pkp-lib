@@ -84,7 +84,7 @@ class DataCitationEditForm extends FormComponent
             'value' => null
         ]));
 
-        $this->addField(new FieldAuthors('authors', [
+        $this->addField(new FieldAuthors('authorsList', [
             'label' => __('submission.dataCitations.label.creators'),
             'description' => '',
             'value' => null,

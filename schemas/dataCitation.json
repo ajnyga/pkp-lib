@@ -7,7 +7,7 @@
         "title"
     ],
 	"properties": {
-		"authors": {
+		"authorsList": {
 			"type": "array",
             "origin": "setting",
 			"description": "A list of the creators for this dataset.",

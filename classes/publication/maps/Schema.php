@@ -166,7 +166,9 @@ class Schema extends \PKP\core\maps\Schema
                 case 'dataCitations':
                     $data = [];
                     foreach ($publication->getData('dataCitations') as $dataCitation) {
-                        $data[] = Repo::dataCitation()->getSchemaMap()->map($dataCitation);
+                        error_log("PUBLICATION SCHEMA.PHP: here the authorsList has values");
+                        error_log(print_r($dataCitation, true));
+                        $data[] = Repo::dataCitation()->getSchemaMap()->summarize($dataCitation);
                     }
                     $output[$prop] = $data;
                     break;

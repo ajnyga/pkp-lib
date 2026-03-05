@@ -81,7 +81,7 @@ class Schema extends \PKP\core\maps\Schema
         $output = [];
         foreach ($props as $prop) {
             switch ($prop) {
-                case 'authors':
+                case 'authorsList':
                     $authors = [];
                     foreach (is_array($item->getAttribute($prop)) ? $item->getAttribute($prop) : [] as $author) {
                         $authors[] = array_merge($authorModel, $author);
@@ -94,6 +94,10 @@ class Schema extends \PKP\core\maps\Schema
             }
         }
         ksort($output);
+
+        error_log("DATACITATION SCHEMA.PHP");
+        error_log(print_r($output, true));
+
         return $this->withExtensions($output, $item);
     }
 
@@ -105,7 +109,7 @@ class Schema extends \PKP\core\maps\Schema
         $schemaService = new PKPSchemaService();
         $schema = $schemaService->get($this->schema);
         $authorModel = [];
-        foreach (array_keys((array)$schema->properties->authors->items->properties) as $property) {
+        foreach (array_keys((array)$schema->properties->authorsList->items->properties) as $property) {
             $authorModel[$property] = '';
         }
         return $authorModel;
